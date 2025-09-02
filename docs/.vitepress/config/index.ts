@@ -1,24 +1,31 @@
-import { defineConfig } from 'vitepress'
-import { shared } from './shared'
-import { en } from './en'
-import { zh } from './zh'
-
+import { defineConfig } from "vitepress"
+import { shared } from "./shared"
+import { pt } from "./pt"
 
 export default defineConfig({
   ...shared,
   title: "NixOS & Flakes Book",
 
   rewrites: {
-    "en/:rest*": ":rest*",
+    "pt/:rest*": ":rest*",
   },
+  srcExclude: ["en/**/*.md", "zh/**/*.md"],
   locales: {
-    root: { 
-      label: 'English',
-      ...en 
+    root: {
+      label: "Português",
+      ...pt,
+    },
+    en: {
+      label: "English",
+      link: "https://nixos-and-flakes.thiscute.world/",
     },
     zh: {
-      label: '简体中文', 
-      ...zh
+      label: "简体中文",
+      link: "https://nixos-and-flakes.thiscute.world/zh/",
+    },
+    ja: {
+      label: "日本語",
+      link: "https://nixos-and-flakes-ja.hayao0819.com/",
     },
   },
 
@@ -37,14 +44,13 @@ export default defineConfig({
   //   },
   //
   //   // Languages maintained by the original author
-  //   en: { 
+  //   en: {
   //     label: 'English',
   //   link: "https://nixos-and-flakes.thiscute.world/",
   //   },
   //   zh: {
-  //     label: '简体中文', 
+  //     label: '简体中文',
   //     link: "https://nixos-and-flakes.thiscute.world/zh/",
   //   },
   // },
 })
-
