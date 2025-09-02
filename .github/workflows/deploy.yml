@@ -3,7 +3,7 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - main
+      - portuguese
 jobs:
   deploy:
     runs-on: ubuntu-latest
