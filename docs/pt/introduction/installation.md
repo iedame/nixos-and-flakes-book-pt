@@ -1,19 +1,19 @@
-# Installation
+# Instalação
 
-Nix can be installed in various ways:
+O Nix pode set instalado de várias formas:
 
-1. As a package manager on macOS, Linux, or WSL.
-2. As the system environment manager on NixOS, a Linux distribution that utilizes Nix for
-   system management.
+1. Como um gerenciador de pacotes no macOS, Linux ou WSL.
+2. Como o gerenciador do ambiente do sistema no NixOS, uma distribuição Linux que utilize
+   o Nix para o gerenciamento do sistema.
 
-This book primarily focuses on the usage of NixOS and Flakes. Therefore, we will skip
-content that pertains solely to Nix(such as installation on macOS, Linux, or WSL).
+Este livro foca principalmente no uso do NixOS e dos Flakes. Portanto, vamos pular o
+conteúdo que se refere apenas ao Nix (como a instalação no macOS, Linux ou WSL).
 
-The installation process of NixOS is straightforward, but we won't delve into the
-specifics here. For more information, please visit the official download site at
+O processo de instalação do NixOS é direto, mas não vamos nos aprofundar nos detalhes
+aqui. Para mais informações, por favor, visite o site official de download em
 <https://nixos.org/download.html>.
 
-> If you're using macOS,
+> Se você usa macOS, o
 > [ryan4yin/nix-darwin-kickstarter](https://github.com/ryan4yin/nix-darwin-kickstarter)
-> may be a good starting point for you, you can learn how to use Nix with this book and
-> take nix-darwin-kickstarter as a start point to build your own Nix configuration.
+> pode set um bom ponto de partida. Você pode usar este livro para aprender a usar o Nix
+> e, a partir do nix-darwin-kickstarter, criar sua própria configuração Nix.

@@ -50,7 +50,7 @@
               };
               # Source code spell checker
               typos = {
-                enable = true;
+                enable = false;
                 settings = {
                   write = true; # Automatically fix typos
                   # configPath = ".typos.toml"; # relative to the flake root

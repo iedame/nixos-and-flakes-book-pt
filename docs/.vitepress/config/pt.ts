@@ -6,141 +6,141 @@ export const pt = defineConfig({
 
   themeConfig: {
     nav: [
-      { text: "Home", link: "/" },
-      { text: "Preface", link: "/preface.md" },
-      { text: "Get Started", link: "/introduction/index.md" },
-      { text: "Best Practices", link: "/best-practices/intro.md" },
+      { text: "Início", link: "/" },
+      { text: "Prefácio", link: "/preface.md" },
+      { text: "Primeiros Passos", link: "/introduction/index.md" },
+      { text: "Boas Práticas", link: "/best-practices/intro.md" },
     ],
     sidebar: [
       {
-        text: "Preface",
-        items: [{ text: "Preface", link: "/preface.md" }],
+        text: "Prefácio",
+        items: [{ text: "Prefácio", link: "/preface.md" }],
       },
       {
-        text: "Get Started",
+        text: "Primeiros Passos",
         items: [
-          { text: "Introduction", link: "/introduction/index.md" },
+          { text: "Introdução", link: "/introduction/index.md" },
           {
-            text: "Advantages and Disadvantages",
+            text: "Vantagens e Desvantagens",
             link: "/introduction/advantages-and-disadvantages.md",
           },
           {
-            text: "Installation",
+            text: "Instalação",
             link: "/introduction/installation.md",
           },
         ],
       },
       {
-        text: "The Nix Language",
-        items: [{ text: "Basics", link: "/the-nix-language/index.md" }],
+        text: "A Linguagem Nix",
+        items: [{ text: "Noções Básicas", link: "/the-nix-language/index.md" }],
       },
       {
-        text: "NixOS with Flakes",
+        text: "NixOS com Flakes",
         items: [
           {
-            text: "Get Started with NixOS",
+            text: "Primeiros Passos com o NixOS",
             link: "/nixos-with-flakes/get-started-with-nixos.md",
           },
           {
-            text: "Introduction to Flakes",
+            text: "Introdução aos Flakes",
             link: "/nixos-with-flakes/introduction-to-flakes.md",
           },
           {
-            text: "NixOS with Flakes Enabled",
+            text: "NixOS com Flakes Habilitados",
             link: "/nixos-with-flakes/nixos-with-flakes-enabled.md",
           },
           {
-            text: "NixOS's flake.nix Explained",
+            text: "Entendendo o flake.nix do NixOS",
             link: "/nixos-with-flakes/nixos-flake-configuration-explained.md",
           },
           {
-            text: "The combination ability of Flakes and Nixpkgs module system",
+            text: "A Capacidade de Combinação dos Flakes com o Sistema de Módulos do Nixpkgs",
             link: "/nixos-with-flakes/nixos-flake-and-module-system.md",
           },
           {
-            text: "Getting Started with Home Manager",
+            text: "Primeiros Passos com o Home Manager",
             link: "/nixos-with-flakes/start-using-home-manager.md",
           },
           {
-            text: "Modularize the Configuration",
+            text: "Modularizando a Configuração",
             link: "/nixos-with-flakes/modularize-the-configuration.md",
           },
           {
-            text: "Updating the System",
+            text: "Atualizando o Sistema",
             link: "/nixos-with-flakes/update-the-system.md",
           },
           {
-            text: "Downgrading or Upgrading Packages",
+            text: "Fazendo Downgrade ou Upgrade de Pacotes",
             link: "/nixos-with-flakes/downgrade-or-upgrade-packages.md",
           },
           {
-            text: "Other useful Tips",
+            text: "Outras Dicas Úteis",
             link: "/nixos-with-flakes/other-useful-tips.md",
           },
         ],
       },
       {
-        text: "Nixpkgs's Advanced Usage",
+        text: "Uso Avançado do Nixpkgs",
         items: [
-          { text: "Introduction", link: "/nixpkgs/intro.md" },
+          { text: "Introdução", link: "/nixpkgs/intro.md" },
           { text: "callPackage", link: "/nixpkgs/callpackage.md" },
-          { text: "Overriding", link: "/nixpkgs/overriding.md" },
+          { text: "Sobrescrevendo com override", link: "/nixpkgs/overriding.md" },
           { text: "Overlays", link: "/nixpkgs/overlays.md" },
           {
-            text: "Multiple Nixpkgs Instances",
+            text: "Múltiplas Instâncias do Nixpkgs",
             link: "/nixpkgs/multiple-nixpkgs.md",
           },
         ],
       },
       {
-        text: "Nix Store & Binary Cache",
+        text: "Nix Store e Binary Cache",
         items: [
-          { text: "Introduction", link: "/nix-store/intro.md" },
+          { text: "Introdução", link: "/nix-store/intro.md" },
           {
-            text: "Add Binary Cache Servers",
+            text: "Adicionando Servidores de Binary Cache",
             link: "/nix-store/add-binary-cache-servers.md",
           },
           {
-            text: "Host Your Own Binary Cache Server",
+            text: "Hospedando seu Próprio Servidor de Binary Cache",
             link: "/nix-store/host-your-own-binary-cache-server.md",
           },
         ],
       },
       {
-        text: "Best Practices",
+        text: "Boas Práticas",
         items: [
-          { text: "Introduction", link: "/best-practices/intro.md" },
+          { text: "Introdução", link: "/best-practices/intro.md" },
           {
-            text: "Run downloaded binaries on NixOS",
+            text: "Executando Binários Baixados no NixOS",
             link: "/best-practices/run-downloaded-binaries-on-nixos.md",
           },
           {
-            text: "Simplify NixOS-related Commands",
+            text: "Simplificando Commandos Relacionados ao NixOS",
             link: "/best-practices/simplify-nixos-related-commands.md",
           },
           {
-            text: "Accelerating Dotfiles Debugging",
+            text: "Acelerando a Depuração de Dotfiles",
             link: "/best-practices/accelerating-dotfiles-debugging.md",
           },
           {
-            text: "Custom NIX_PATH and Flake Registry",
+            text: "NIX_PATH Personalizado e Registro de Flake",
             link: "/best-practices/nix-path-and-flake-registry.md",
           },
           {
-            text: "Remote Deployment",
+            text: "Implantação Remota",
             link: "/best-practices/remote-deployment.md",
           },
           {
-            text: "Debugging Derivations and Nix Expressions",
+            text: "Depurando Derivations e Nix Expressions",
             link: "/best-practices/debugging.md",
           },
         ],
       },
 
       {
-        text: "Other Usage of Flakes",
+        text: "Outros Usos de Flakes",
         items: [
-          { text: "Introduction", link: "/other-usage-of-flakes/intro.md" },
+          { text: "Introdução", link: "/other-usage-of-flakes/intro.md" },
           {
             text: "Flake Inputs",
             link: "/other-usage-of-flakes/inputs.md",
@@ -150,55 +150,55 @@ export const pt = defineConfig({
             link: "/other-usage-of-flakes/outputs.md",
           },
           {
-            text: "The New CLI",
+            text: "A Nova Interface de Linha de Commando",
             link: "/other-usage-of-flakes/the-new-cli.md",
           },
           {
-            text: "Module System & Custom Options",
+            text: "Sistema de Módulos e Opções Personalizadas",
             link: "/other-usage-of-flakes/module-system.md",
           },
           {
-            text: "[WIP]Testing",
+            text: "[WIP] Testando",
             link: "/other-usage-of-flakes/testing.md",
           },
         ],
       },
       {
-        text: "Dev Environments on NixOS",
+        text: "Ambientes de Desenvolvimento no NixOS",
         items: [
           {
-            text: "nix shell, nix develop & pkgs.runCommand",
+            text: "nix shell, nix develop e pkgs.runCommand",
             link: "/development/intro.md",
           },
           {
-            text: "Dev Environments",
+            text: "Ambientes de Desenvolvimento",
             link: "/development/dev-environments.md",
           },
           {
-            text: "[WIP]Packaging 101",
+            text: "[WIP] Empacotamento 101",
             link: "/development/packaging-101.md",
           },
           {
-            text: "Cross-platform Compilation",
+            text: "Compilação Multiplataforma",
             link: "/development/cross-platform-compilation.md",
           },
           {
-            text: "Distributed Building",
+            text: "Compilação Distribuída",
             link: "/development/distributed-building.md",
           },
           {
-            text: "[WIP]Kernel Development",
+            text: "[WIP] Desenvolvimento de Kernel",
             link: "/development/kernel-development.md",
           },
         ],
       },
       {
-        text: "Advanced Topics",
-        items: [{ text: "Advanced Topics", link: "/advanced-topics/index.md" }],
+        text: "Tópicos Avançados",
+        items: [{ text: "Tópicos Avançados", link: "/advanced-topics/index.md" }],
       },
       {
-        text: "Frequently Asked Questions",
-        items: [{ text: "Frequently Asked Questions", link: "/faq/index.md" }],
+        text: "Perguntas Frequentes",
+        items: [{ text: "Perguntas Frequentes", link: "/faq/index.md" }],
       },
     ],
   },

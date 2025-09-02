@@ -15,7 +15,7 @@ export const shared = defineConfig({
   // SEO Improvement - sitemap.xml & robots.txt
   buildEnd: async ({ outDir }) => {
     sitemap({
-      hostname: "https://nixos-and-flakes.thiscute.world/",
+      hostname: "https://iedame.github.io/nixos-and-flakes-book-pt/",
       outDir: outDir,
       generateRobotsTxt: true,
     })
@@ -65,14 +65,16 @@ export const shared = defineConfig({
       "meta",
       {
         name: "og:image",
-        content: "https://nixos-and-flakes.thiscute.world/nixos-and-flakes-book.webp",
+        content:
+          "https://iedame.github.io/nixos-and-flakes-book-pt/nixos-and-flakes-book.webp",
       },
     ],
     [
       "meta",
       {
         name: "twitter:image",
-        content: "https://nixos-and-flakes.thiscute.world/nixos-and-flakes-book.webp",
+        content:
+          "https://iedame.github.io/nixos-and-flakes-book-pt/nixos-and-flakes-book.webp",
       },
     ],
 
@@ -96,9 +98,9 @@ export const shared = defineConfig({
   themeConfig: {
     footer: {
       message:
-        'Licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1" target="_blank">CC BY-SA 4.0</a>',
+        'Licenciado sob <a href="http://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1" target="_blank">CC BY-SA 4.0</a>',
       copyright:
-        'Copyright © 2023-present <a href="https://github.com/ryan4yin" target="_blank">Ryan Yin</a>',
+        'Copyright © 2023-present <a href="https://github.com/ryan4yin" target="_blank">Ryan Yin</a> e traduzido por <a href="https://github.com/iedame" target="_blank">Rafael Ieda</a>',
     },
 
     search: {
@@ -128,13 +130,14 @@ export const shared = defineConfig({
     },
 
     editLink: {
-      pattern: "https://github.com/ryan4yin/nixos-and-flakes-book/edit/main/docs/:path",
+      pattern:
+        "https://github.com/iedame/nixos-and-flakes-book-pt/edit/portuguese/docs/:path",
     },
 
     socialLinks: [
       {
         icon: "github",
-        link: "https://github.com/ryan4yin/nixos-and-flakes-book",
+        link: "https://github.com/iedame/nixos-and-flakes-book-pt",
       },
     ],
   },
@@ -145,9 +148,9 @@ function getJSONLD(pageData: PageData) {
     return `{
   "@context":"http://schema.org",
   "@type":"WebSite",
-  "url":"https:\/\/nixos-and-flakes.thiscute.world\/",
-  "inLanguage":"en",
-  "description":"An unofficial and opinionated book for beginners",
+  "url":"https:\/\/iedame.github.io\/nixos-and-flakes-book-pt\/",
+  "inLanguage":"pt-BR",
+  "description":"Um livro não official e com opiniões para iniciantes",
   "name":"${pageData.title}"
 }`
   } else if (pageData.relativePath === "zh/index.md") {

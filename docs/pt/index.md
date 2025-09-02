@@ -22,7 +22,7 @@ hero:
       link: /introduction/index.md
     - theme: alt
       text: Ver no GitHub
-      link: https://github.com/ryan4yin/nixos-and-flakes-book
+      link: https://github.com/iedame/nixos-and-flakes-book-pt
 # features:
 #   - title: Feature A
 #     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
