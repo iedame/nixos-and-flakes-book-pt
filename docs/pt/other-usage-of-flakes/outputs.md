@@ -1,29 +1,29 @@
 # Flake Outputs
 
-In `flake.nix`, the `outputs` section defines the different outputs that a flake can
-produce during its build process. A flake can have multiple outputs simultaneously, which
-can include but are not limited to the following:
+Em `flake.nix`, a seção `outputs` define as diferentes saídas que um flake pode produzir
+durante seu processo de build. Um flake pode ter múltiplas saídas simultaneamente, que
+podem incluir, entre outras, as seguintes:
 
-- Nix packages: These are named `apps.<system>.<name>`, `packages.<system>.<name>`, or
-  `legacyPackages.<system>.<name>`. You can build a specific package using the command
-  `nix build .#<name>`.
-- Nix helper functions: These are named `lib.<name>` and serve as libraries for other
-  flakes to use.
-- Nix development environments: These are named `devShells` and provide isolated
-  development environments. They can be accessed using the command `nix develop`.
-- NixOS configurations: These are named `nixosConfiguration` and represent specific NixOS
-  system configurations. You can activate a configuration using the command
+- Pacotes Nix: Eles recebem os nomes `apps.<system>.<name>`, `packages.<system>.<name>`,
+  ou `legacyPackages.<system>.<name>`. Você pode construir um pacote específico usando o
+  comando `nix build .#<name>`.
+- Funções auxiliares Nix: Elas recebem o nome `lib.<name>` e servem como bibliotecas para
+  outros flakes.
+- Ambientes de desenvolvimento Nix: Recebem o nome `devShells` e fornecem ambientes de
+  desenvolvimento isolados. Eles podem ser acessados usando o comando `nix develop`.
+- Configurações NixOS: Recebem o nome `nixosConfiguration` e representam configurações
+  específicas do sistema NixOS. Você pode ativar uma configuração usando o comando
   `nixos-rebuild switch --flake .#<name>`.
-- Nix templates: These are named `templates` and can be used as a starting point for
-  creating new projects. You can generate a project using the command
+- Modelos Nix (templates): Recebem o nome `templates` podem ser usados como ponto de
+  partida para criar novos projetos. Você pode gerar um projeto usando o comando
   `nix flake init --template <reference>`.
-- Other user-defined outputs: These outputs can be defined by the user and may be used by
-  other Nix-related tools.
+- Outras saídas definidas pelo usuário: Essas saídas podem ser definidas pelo usuário e
+  podem ser usadas por outras ferramentas relacionadas ao Nix.
 
-See official doc for details - [Flakes Check - Nix Manual].
+Consulte a documentação oficial para mais detalhes - [Flakes Check - Nix Manual].
 
-Here's an example excerpt from the NixOS Wiki that demonstrates the structure of the
-`outputs` section:
+Aqui está um trecho de exemplo da Wiki do NixOS que demonstra a estrutura da seção
+`outputs`:
 
 ```nix
 {
@@ -78,7 +78,7 @@ Here's an example excerpt from the NixOS Wiki that demonstrates the structure of
 }
 ```
 
-## References
+## Referências
 
 - [Flakes Check - Nix Manual]
 

@@ -1,9 +1,10 @@
 # Flake Inputs
 
-The `inputs` section in `flake.nix` is an attribute set used to specify the dependencies
-of the current flake. There are various types of inputs, as shown in the examples below:
+A seção `inputs` no `flake.nix` é um _attribute set_ usado para especificar as
+dependências do flake atual. Existem vários tipos de entradas, como mostrado nos exemplos
+abaixo:
 
-> See Official docs for details - [Flakes Inputs - Nix Manual].
+> Consulte a documentação oficial para mais detalhes - [Flakes Inputs - Nix Manual].
 
 ```nix
 {
@@ -67,7 +68,7 @@ of the current flake. There are various types of inputs, as shown in the example
 }
 ```
 
-## References
+## Referências
 
 - [Flakes Inputs - Nix Manual]
 

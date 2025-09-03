@@ -1,29 +1,29 @@
-# Usage of the New CLI
+# A Nova Interface de Linha de Comando
 
-Once you have enabled the `nix-command` and `flakes` features, you can start using the new
-generation Nix command-line tools provided by [New Nix Commands][New Nix Commands]. In
-this section, we will focus on two commands: `nix shell` and `nix run`. Other important
-commands like `nix build` will be discussed in detail in
-[`nix develop` & `pkgs.mkShell`](/development/intro.md)
+Após habilitar os recursos `nix-command` e `flakes`, você pode começar a usar as
+ferramentas de linha de comando da nova geração do Nix fornecidas por [New Nix
+Commands][New Nix Commands]. Nesta seção, vamos focar em dois comandos: `nix shell` e
+`nix run`. Outros comandos importantes, como o `nix build`, serão discutidos em detalhes
+em [`nix develop` e `pkgs.mkShell`](/development/intro.md)
 
 ## `nix shell`
 
-The `nix shell` command allows you to enter an environment with the specified Nix package
-and opens an interactive shell within that environment:
+O comando `nix shell` permite que você entre em um ambiente com o pacote Nix especificado
+e abra um shell interativo dentro desse ambiente:
 
 ```shell
-# hello is not available
+# hello não está disponível
 › hello
-hello: command not found
+hello: comando não encontrado
 
-# Enter an environment with the 'hello' and `cowsay` package
+# Entre em um ambiente com os pacotes 'hello' e `cowsay`
 › nix shell nixpkgs#hello nixpkgs#cowsay
 
-# hello is now available
+# hello agora está disponível
 › hello
 Hello, world!
 
-# ponysay is also available
+# cowsay também está disponível
 › cowsay "Hello, world!"
  _______
 < hello >
@@ -37,61 +37,59 @@ Hello, world!
 
 ## `nix run`
 
-On the other hand, `nix run` creates an environment with the specified Nix package and
-directly runs that package within the environment (without installing it into the system
-environment):
+Por outro lado, o `nix run` cria um ambiente com o pacote Nix especificado e executa esse
+pacote diretamente dentro do ambiente (sem instalá-lo no ambiente do sistema):
 
 ```shell
-# hello is not available
+# hello não está disponível
 › hello
-hello: command not found
+hello: comando não encontrado
 
-# Create an environment with the 'hello' package and run it
+# Crie um ambiente com o pacote 'hello' e o execute.
 › nix run nixpkgs#hello
 Hello, world!
 ```
 
-Since `nix run` directly executes the Nix package, the package specified as the argument
-must generate an executable program.
+Como o `nix run` executa o pacote Nix diretamente, o pacote especificado como argumento
+deve gerar um programa executável.
 
-According to the `nix run --help` documentation, `nix run` executes the command
-`<out>/bin/<name>`, where `<out>` is the root directory of the derivation and `<name>` is
-selected in the following order:
+De acordo com a documentação do `nix run --help`, o `nix run` executa o comando
+`<out>/bin/<name>`, onde `<out>` ié o diretório raiz da derivation e `<name>` é
+selecionado na seguinte ordem:
 
-- The `meta.mainProgram` attribute of the derivation
-- The `pname` attribute of the derivation
-- The content of the `name` attribute of the derivation with the version number removed
+- O atributo `meta.mainProgram` da derivation.
+- O atributo `pname` da derivation.
+- O conteúdo do atributo `name` da derivation com o número da versão removido.
 
-For example, in the case of the 'hello' package we tested earlier, `nix run` actually
-executes the program `$out/bin/hello`.
+Por exemplo, no caso do pacote 'hello' que testamos anteriormente, o nix run na verdade
+executa o programa `$out/bin/hello`.
 
-Here are two more examples with detailed explanations of the relevant parameters:
+Aqui estão mais dois exemplos com explicações detalhadas dos parâmetros relevantes:
 
 ```bash
-# Explanation of the command:
-#   `nixpkgs#ponysay` means the 'ponysay' package in the 'nixpkgs' flake.
-#   `nixpkgs` is a flake registry id, and Nix will find the corresponding GitHub repository address
-#   from <https://github.com/NixOS/flake-registry/blob/master/flake-registry.json>.
-# Therefore, this command creates a new environment, installs, and runs the 'ponysay' package provided by the 'nixpkgs' flake.
-#   Note: It has been mentioned earlier that a Nix package is one of the outputs of a flake.
+# Explicação do comando:
+#   `nixpkgs#ponysay` significa o pacote 'ponysay' no flake 'nixpkgs'.
+# `nixpkgs` é um ID do registro de flakes, e o Nix encontrará o endereço do repositório correspondente no GitHub a partir de <https://github.com/NixOS/flake-registry/blob/master/flake-registry.json>.
+# Portanto, este comando cria um novo ambiente, instala e executa o pacote 'ponysay' fornecido pelo flake 'nixpkgs'.
+# Observação: Foi mencionado anteriormente que um pacote Nix é uma das saídas de um flake.
 echo "Hello Nix" | nix run "nixpkgs#ponysay"
 
-# This command has the same effect as the previous one, but it uses the complete flake URI instead of the flake registry id.
+# Este comando tem o mesmo efeito que o anterior, mas usa a URI completa do flake em vez do ID do registro de flakes.
 echo "Hello Nix" | nix run "github:NixOS/nixpkgs/nixos-unstable#ponysay"
 ```
 
-## Common Use Cases for `nix run` and `nix shell`
+## Casos de Uso Comuns para `nix run` e `nix shell`
 
-These commands are commonly used for running programs temporarily. For example, if I want
-to clone my configuration repository using Git on a new NixOS host without Git installed,
-I can use the following command:
+Esses comandos são comumente usados para executar programas de forma temporária. Por
+exemplo, se eu quiser clonar meu repositório de configuração usando o Git em um novo host
+NixOS sem ter o Git instalado, posso usar o seguinte comando:
 
 ```bash
 nix run nixpkgs#git clone git@github.com:ryan4yin/nix-config.git
 ```
 
-Alternatively, I can use `nix shell` to enter an environment with Git and then run the
-`git clone` command:
+Como alternativa, posso usar o `nix shell` para entrar em um ambiente com o Git e, em
+seguida, executar o comando `git clone`:
 
 ```bash
 nix shell nixpkgs#git
