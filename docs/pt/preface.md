@@ -108,8 +108,6 @@ desenvolvimento.
 
 ## Feedback e Discussão
 
-Sugestão de Tradução
-
 Eu não sou um especialista em NixOS, e só tenho usado o NixOS por menos de 9 meses até
 agora (Fevereiro de 2024). Então, deve haver alguns equívocos ou casos complexos no livro.
 Se alguém encontrar algo incorreto ou tiver quaisquer perguntas ou sugestões, basta me
