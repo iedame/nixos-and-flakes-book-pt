@@ -1,94 +1,98 @@
-# Enabling NixOS with Flakes
+# NixOS com Flakes Habilitados
 
-Compared to the default configuration method currently used in NixOS, Flakes offers better
-reproducibility. Its clear package structure definition inherently supports dependencies
-on other Git repositories, facilitating code sharing. Therefore, this book suggests using
-Flakes to manage system configurations.
+Comparado ao método de configuração padrão atualmente usado no NixOS, os Flakes oferecem
+melhor reprodutibilidade. Sua clara definição de estrutura de pacotes suporta
+inerentemente dependências de outros repositórios Git, facilitando o compartilhamento de
+código. Portanto, este livro sugere o uso de Flakes para gerenciar as configurações do
+sistema.
 
-This section describes how to use Flakes to manage NixOS system configuration, and **you
-don't need to know anything about Flakes in advance**.
+Esta seção descreve como usar Flakes para gerenciar a configuração do sistema NixOS, e
+você não precisa saber nada sobre Flakes com antecedência.
 
-## Enabling Flakes Support for NixOS {#enable-nix-flakes}
+## Habilitando o Suporte a Flakes para NixOS {#enable-nix-flakes}
 
-Currently, Flakes is still an experimental feature and not enabled by default. We need to
-manually modify the `/etc/nixos/configuration.nix` file to enable the Flakes feature and
-the accompanying new nix command-line tool:
+Atualmente, Flakes ainda é uma funcionalidade experimental e não está habilitada por
+padrão. Precisamos modificar manualmente o arquivo `/etc/nixos/configuration.nix` para
+habilitar a funcionalidade Flakes e a nova ferramenta de linha de comando Nix que a
+acompanha:
 
 ```nix{12,16}
 { config, pkgs, ... }:
 
 {
   imports = [
-    # Include the results of the hardware scan.
+    # Incluir os resultados da análise de hardware.
     ./hardware-configuration.nix
   ];
 
   # ......
 
-  # Enable the Flakes feature and the accompanying new nix command-line tool
+  # Habilitar a funcionalidade Flakes e a nova ferramenta de linha de comando Nix
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   environment.systemPackages = with pkgs; [
-    # Flakes clones its dependencies through the git command,
-    # so git must be installed first
+    # Flakes clona suas dependências através do comando git,
+    # então o git deve ser instalado primeiro
     git
     vim
     wget
   ];
-  # Set the default editor to vim
+  # Definir o editor padrão como vim
   environment.variables.EDITOR = "vim";
 
   # ......
 }
 ```
 
-After making these changes, run `sudo nixos-rebuild switch` to apply the modifications.
-Then, you can use the Flakes feature to manage your system configuration.
+Após fazer essas alterações, execute `sudo nixos-rebuild switch` para aplicar as
+modificações. Em seguida, você pode usar a funcionalidade Flakes para gerenciar a
+configuração do seu sistema.
 
-The new nix command-line tool also offers some convenient features. For example, you can
-now use the `nix repl` command to open a nix interactive environment. If you're
-interested, you can use it to review and test all the Nix syntax you've learned before.
+A nova ferramenta de linha de comando Nix também oferece algumas funcionalidades
+convenientes. Por exemplo, agora você pode usar o comando `nix repl` para abrir um
+ambiente interativo Nix. Se estiver interessado, você pode usá-lo para revisar e testar
+toda a sintaxe Nix que aprendeu anteriormente.
 
-## Switching System Configuration to `flake.nix` {#switch-to-flake-nix}
+## Alternando a Configuração do Sistema para flake.nix {#switch-to-flake-nix}
 
-After enabling the Flakes feature, the `sudo nixos-rebuild switch` command will prioritize
-reading the `/etc/nixos/flake.nix` file, and if it's not found, it will attempt to use
-`/etc/nixos/configuration.nix`.
+Após habilitar a funcionalidade Flakes, o comando `sudo nixos-rebuild switch` dará
+prioridade à leitura do arquivo `/etc/nixos/flake.nix` file, e, se não o encontrar,
+tentará usar o `/etc/nixos/configuration.nix`.
 
-You can start by using the official templates to learn how to write a flake. First, check
-what templates are available:
+Você pode começar usando os modelos oficiais para aprender a escrever um flake. Primeiro,
+verifique quais modelos estão disponíveis:
 
 ```bash
 nix flake show templates
 ```
 
-Among them, the `templates#full` template demonstrates all possible usage. Take a look at
-its content:
+Entre eles, o modelo `templates#full` demonstra todos os usos possíveis. Dê uma olhada em
+seu conteúdo:
 
 ```bash
 nix flake init -t templates#full
 cat flake.nix
 ```
 
-Referencing this template, create the file `/etc/nixos/flake.nix` and write the
-configuration content. All subsequent system modifications will be taken over by Nix
-Flakes. Here's an example of the content:
+Com base neste modelo, crie o arquivo `/etc/nixos/flake.nix` e escreva o conteúdo da
+configuração. Todas as modificações subsequentes do sistema serão gerenciadas pelos Nix
+Flakes. Aqui está um exemplo do conteúdo:
 
 ```nix{16}
 {
-  description = "A simple NixOS flake";
+  description = "Um flake simples para NixOS";
 
   inputs = {
-    # NixOS official package source, using the nixos-25.05 branch here
+    # Fonte oficial de pacotes NixOS, usando o ramo nixos-25.05 aqui
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
   };
 
   outputs = { self, nixpkgs, ... }@inputs: {
-    # Please replace my-nixos with your hostname
+    # Por favor, substitua my-nixos pelo seu nome de host
     nixosConfigurations.my-nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        # Import the previous configuration.nix we used,
-        # so the old configuration file still takes effect
+        # Importar o configuration.nix anterior que usamos,
+        # para que o antigo arquivo de configuração ainda tenha efeito
         ./configuration.nix
       ];
     };
@@ -96,54 +100,55 @@ Flakes. Here's an example of the content:
 }
 ```
 
-Here we defined a system named `my-nixos`, with its configuration file located at
-`/etc/nixos/` as `./configuration.nix`. This means we are still using the old
-configuration.
+Aqui definimos um sistema chamado `my-nixos`, com seu arquivo de configuração localizado
+em `/etc/nixos/` como `./configuration.nix`. Isso significa que ainda estamos usando a
+configuração antiga.
 
-Now, when you execute `sudo nixos-rebuild switch` to apply the configuration, the system
-should not change at all because we have simply switched to using Nix Flakes, and the
-configuration content remains consistent with before.
+Agora, quando você executa `sudo nixos-rebuild switch` para aplicar a configuração, o
+sistema não deve mudar em nada, pois simplesmente mudamos para usar os Nix Flakes, e o
+conteúdo da configuração permanece consistente com o anterior.
 
-> If your system's hostname is not `my-nixos`, you need to modify the name of
-> `nixosConfigurations` in `flake.nix`, or use `--flake /etc/nixos#my-nixos` to specify
-> the configuration name.
+> Se o nome do seu host não for `my-nixos`, você precisa modificar o nome de
+> `nixosConfigurations` em `flake.nix`, ou usar `--flake /etc/nixos#my-nixos` para
+> especificar o nome da configuração.
 
-After the switch, we can manage the system through the Flakes feature.
+Após a mudança, podemos gerenciar o sistema através da funcionalidade Flakes.
 
-Currently, our flake includes these files:
+Atualmente, nosso flake inclui estes arquivos:
 
-- `/etc/nixos/flake.nix`: The entrypoint for the flake, which is recognized and deployed
-  when `sudo nixos-rebuild switch` is executed.
-- `/etc/nixos/flake.lock`: The automatically generated version lock file, which records
-  the data sources, hash values, and version numbers of all inputs in the entire flake,
-  ensuring system reproducibility.
-- `/etc/nixos/configuration.nix`: This is our previous configuration file, which is
-  imported as a module in `flake.nix`. Currently, all system configurations are written in
-  this file.
-- `/etc/nixos/hardware-configuration.nix`: This is the system hardware configuration file,
-  generated by NixOS, which describes the system's hardware information.
+- `/etc/nixos/flake.nix`: O ponto de entrada para o flake, que é reconhecido e implantado
+  quando `sudo nixos-rebuild switch` é executado.
+- `/etc/nixos/flake.lock`: O arquivo de bloqueio de versão gerado automaticamente, que
+  registra as fontes de dados, os valores de hash e os números de versão de todas as
+  entradas em todo o flake, garantindo a reprodutibilidade do sistema.
+- `/etc/nixos/configuration.nix`: Este é o nosso arquivo de configuração anterior, que é
+  importado como um módulo em `flake.nix`. Atualmente, todas as configurações do sistema
+  são escritas neste arquivo.
+- `/etc/nixos/hardware-configuration.nix`: ste é o arquivo de configuração de hardware do
+  sistema, gerado pelo NixOS, que descreve as informações de hardware do sistema.
 
-## Conclusion
+## Conclusão
 
-Up to this point, we have merely added a very simple configuration file,
-`/etc/nixos/flake.nix`, which has merely been a thin wrapper around
-`/etc/nixos/configuration.nix`, offering no new functionality and introducing no
-disruptive changes.
+Até este ponto, nós apenas adicionamos um arquivo de configuração muito simples,
+`/etc/nixos/flake.nix`, que tem sido apenas um invólucro fino em torno de
+`/etc/nixos/configuration.nix`, não oferecendo nenhuma nova funcionalidade e não
+introduzindo nenhuma mudança disruptiva.
 
-In the content of the book that follows, we will learn about the structure and
-functionality of `flake.nix` and gradually see the benefits that such a wrapper can bring.
+No conteúdo que se segue no livro, aprenderemos sobre a estrutura e funcionalidade de
+`flake.nix` e gradualmente veremos os benefícios que tal invólucro pode trazer.
 
-> Note: The configuration management method described in this book is NOT "Everything in a
-> single file". It is recommended to categorize configuration content into different nix
-> files, then introduce these configuration files in the `modules` list of `flake.nix`,
-> and manage them with Git.
+> Observação: O método de gerenciamento de configuração descrito neste livro NÃO é "Tudo
+> em um único arquivo". É recomendado categorizar o conteúdo da configuração em diferentes
+> arquivos Nix, e então introduzir esses arquivos de configuração na lista `modules` do
+> `flake.nix`, e gerenciá-los com o Git.
 >
-> The benefits of this approach are better organization of configuration files and
-> improved maintainability of the configuration. The section
-> [Modularizing NixOS Configuration](./modularize-the-configuration.md) will explain in
-> detail how to modularize your NixOS configuration, and
-> [Other Useful Tips - Managing NixOS Configuration with Git](./other-useful-tips.md) will
-> introduce several best practices for managing NixOS configuration with Git.
+> Os benefícios desta abordagem são uma melhor organização dos arquivos de configuração e
+> uma melhor manutenibilidade da configuração. A seção
+> [Modularizando a Configuração do NixOS](./modularize-the-configuration.md) irá explicar
+> em detalhes como modularizar sua configuração do NixOS, e
+> [ Outras Dicas Úteis - Gerenciando a Configuração do NixOS com Git](./other-useful-tips.md)
+> irá introduzir várias melhores práticas para gerenciar a configuração do NixOS com o
+> Git.
 
 [nix flake - Nix Manual]:
   https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake#flake-inputs

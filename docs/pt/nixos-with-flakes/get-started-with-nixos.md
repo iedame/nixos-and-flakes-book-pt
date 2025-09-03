@@ -1,58 +1,60 @@
-# Get Started with NixOS
+# Primeiros Passos com o NixOS
 
-Now that we have learned the basics of the Nix language, we can start using it to
-configure our NixOS system. The default configuration file for NixOS is located at
-`/etc/nixos/configuration.nix`. This file contains all the declarative configuration for
-the system, including settings for the time zone, language, keyboard layout, network,
-users, file system, and boot options.
+Agora que aprendemos o básico da linguagem Nix, podemos começar a usá-la para configurar
+nosso sistema NixOS. O arquivo de configuração padrão para o NixOS está localizado em
+`/etc/nixos/configuration.nix`. Este arquivo contém toda a configuração declarativa para o
+sistema, incluindo definições para fuso horário, idioma, layout de teclado, rede,
+usuários, sistema de arquivos e opções de boot.
 
-To modify the system state in a reproducible manner (which is highly recommended), we need
-to manually edit the `/etc/nixos/configuration.nix` file and then execute
-`sudo nixos-rebuild switch` to apply the modified configuration. This command generates a
-new system environment based on the modified configuration file, sets the new environment
-as the default one, and preserves the previous environment in the boot options of
-grub/systemd-boot. This ensures that we can always roll back to the old environment even
-if the new one fails to start.
+Para modificar o estado do sistema de maneira reprodutível (o que é altamente
+recomendado), precisamos editar manualmente o arquivo `/etc/nixos/configuration.nix` e, em
+seguida, executar `sudo nixos-rebuild switch` para aplicar a configuração modificada. Este
+comando gera um novo ambiente de sistema com base no arquivo de configuração modificado,
+define o novo ambiente como o padrão e preserva o ambiente anterior nas opções de boot do
+grub/systemd-boot. Isso garante que sempre podemos reverter para o ambiente antigo, mesmo
+se o novo falhar ao iniciar.
 
-While `/etc/nixos/configuration.nix` is the classic method for configuring NixOS, it
-relies on data sources configured by `nix-channel` and lacks a version-locking mechanism,
-making it challenging to ensure the reproducibility of the system. A better approach is to
-use Flakes, which provides reproducibility and facilitates configuration management.
+Embora `/etc/nixos/configuration.nix` seja o método clássico para configurar o NixOS, ele
+depende de fontes de dados configuradas por `nix-channel` e carece de um mecanismo de
+bloqueio de versão, tornando difícil garantir a reprodutibilidade do sistema. Uma
+abordagem melhor é usar os Flakes, que fornecem reprodutibilidade e facilitam o
+gerenciamento da configuração.
 
-In this section, we will first learn how to manage NixOS using the classic method
-(`/etc/nixos/configuration.nix`), and then we will explore the more advanced Flakes.
+Nesta seção, primeiro aprenderemos como gerenciar o NixOS usando o método clássico
+(`/etc/nixos/configuration.nix`), e, em seguida, exploraremos os Flakes, que são mais
+avançados.
 
-## Configuring the System using `/etc/nixos/configuration.nix`
+## Configurando o Sistema Usando `/etc/nixos/configuration.nix`
 
-The `/etc/nixos/configuration.nix` file is the default and classic method for configuring
-NixOS. While it lacks some of the advanced features of Flakes, it is still widely used and
-provides flexibility in system configuration.
+O arquivo `/etc/nixos/configuration.nix` é o método padrão e clássico para configurar o
+NixOS. Embora lhe faltem algumas das funcionalidades avançadas dos Flakes, ele ainda é
+amplamente utilizado e oferece flexibilidade na configuração do sistema.
 
-To illustrate how to use `/etc/nixos/configuration.nix`, let's consider an example where
-we enable SSH and add a user named `ryan` to the system. We can achieve this by adding the
-following content to `/etc/nixos/configuration.nix`:
+Para ilustrar como usar o `/etc/nixos/configuration.nix`, vamos considerar um exemplo onde
+habilitamos o SSH e adicionamos um usuário chamado `ryan` ao sistema. Podemos alcançar
+isso adicionando o seguinte conteúdo ao `/etc/nixos/configuration.nix`:
 
 ```nix{14-38}
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# Edite este arquivo de configuração para definir o que deve ser instalado em
+# seu sistema. A ajuda está disponível na página de manual de configuration.nix(5)
+# e no manual do NixOS (acessível executando 'nixos-help').
 { config, pkgs, ... }:
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [ # Inclua os resultados da análise de hardware.
       ./hardware-configuration.nix
     ];
 
-  # Omit previous configuration settings...
+  # Omitir configurações anteriores...
 
-  # Add user 'ryan'
+  # Adicionar usuário 'ryan'
   users.users.ryan = {
     isNormalUser = true;
     description = "ryan";
     extraGroups = [ "networkmanager" "wheel" ];
     openssh.authorizedKeys.keys = [
-        # Replace with your own public key
+        # Substitua pela sua própria chave pública
         "ssh-ed25519 <some-public-key> ryan@ryan-pc"
     ];
     packages = with pkgs; [
@@ -61,49 +63,49 @@ following content to `/etc/nixos/configuration.nix`:
     ];
   };
 
-  # Enable the OpenSSH daemon.
+  # Habilitar o daemon OpenSSH.
   services.openssh = {
     enable = true;
     settings = {
       X11Forwarding = true;
-      PermitRootLogin = "no"; # disable root login
-      PasswordAuthentication = false; # disable password login
+      PermitRootLogin = "no"; # desabilitar login de root
+      PasswordAuthentication = false; # desabilitar login por senha
     };
     openFirewall = true;
   };
 
-  # Omit the rest of the configuration...
+  # Omitir o resto da configuração...
 }
 ```
 
-In this configuration, we declare our intention to enable the openssh service, add an SSH
-public key for the user 'ryan', and disable password login.
+Nesta configuração, declaramos nossa intenção de habilitar o serviço openssh, adicionar
+uma chave pública SSH para o usuário `ryan` e desabilitar o login por senha.
 
-To deploy the modified configuration, run `sudo nixos-rebuild switch`. This command will
-apply the changes, generate a new system environment, and set it as the default. You can
-now log in to the system using SSH with the configured SSH keys.
+Para implantar a configuração modificada, execute `sudo nixos-rebuild switch`. Este
+comando irá aplicar as alterações, gerar um novo ambiente de sistema e defini-lo como o
+padrão. Agora você pode fazer login no sistema usando SSH com as chaves SSH configuradas.
 
-> You can always try to add `--show-trace --print-build-logs --verbose` to the
-> `nixos-rebuild` command to get the detailed error message if you encounter any errors
-> during the deployment.
+> Você sempre pode tentar adicionar `--show-trace --print-build-logs --verbose` ao comando
+> `nixos-rebuild` para obter uma mensagem de erro detalhada caso encontre algum erro
+> durante a implantação.
 
-Remember that any reproducible changes to the system can be made by modifying the
-`/etc/nixos/configuration.nix` file and deploying the changes with
+Lembre-se de que quaisquer alterações reprodutíveis no sistema podem ser feitas
+modificando o arquivo `/etc/nixos/configuration.nix` e implantando as alterações com
 `sudo nixos-rebuild switch`.
 
-To find configuration options and documentation:
+Para encontrar opções de configuração e documentação:
 
-- Use search engines like Google, e.g., search for `Chrome NixOS` to find NixOS-related
-  information about Chrome. The NixOS Wiki and the source code of Nixpkgs are usually
-  among the top results.
-- Utilize the [NixOS Options Search](https://search.nixos.org/options) to search for
-  keywords.
-- Refer to the
-  [Configuration section](https://nixos.org/manual/nixos/unstable/index.html#ch-configuration)
-  in the NixOS Manual for system-level configuration documentation.
-- Search for keywords directly in the source code of
-  [nixpkgs](https://github.com/NixOS/nixpkgs) on GitHub.
+- Use motores de busca como o Google, por exemplo, pesquise por `Chrome NixOS` para
+  encontrar informações relacionadas ao NixOS sobre o Chrome. A Wiki do NixOS e o
+  código-fonte do Nixpkgs geralmente estão entre os primeiros resultados.
+- Utilize a [Pesquisa de Opções do NixOS](https://search.nixos.org/options) para buscar
+  palavras-chave.
+- Consulte a
+  [seção de Configuração](https://nixos.org/manual/nixos/unstable/index.html#ch-configuration)
+  no Manual do NixOS para documentação sobre configuração em nível de sistema.
+- Busque por palavras-chave diretamente no código-fonte do
+  [nixpkgs](https://github.com/NixOS/nixpkgs) no GitHub.
 
-## References
+## Referências
 
 - [Overview of the NixOS Linux distribution](https://wiki.nixos.org/wiki/Overview_of_the_NixOS_Linux_distribution)

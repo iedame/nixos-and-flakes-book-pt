@@ -1,130 +1,132 @@
-# Introduction to Flakes
+# Introdução aos Flakes
 
-The flakes experimental feature is a major development for Nix, it introduces a policy for
-managing dependencies between Nix expressions, it improves reproducibility, composability
-and usability in the Nix ecosystem. Although it's still an experimental feature, flakes
-have been widely used by the Nix community.[^1]
+A funcionalidade experimental flakes é um desenvolvimento importante para o Nix. Ela
+introduz uma política para gerenciar dependências entre expressões Nix, melhora a
+reprodutibilidade, a componibilidade e a usabilidade no ecossistema Nix. Embora ainda seja
+um recurso experimental, os flakes são amplamente utilizados pela comunidade Nix.[^1]
 
-Flakes is one of the most significant changes the nix project has ever seen.[^2]
+Flakes é uma das mudanças mais significativas que o projeto Nix já viu.[^2]
 
-In simple terms, if you've worked with some JavaScript/Go/Rust/Python, you should be
-familiar with files like `package.json`/`go.mod`/`Cargo.toml`/`pyproject.toml`. In these
-programming languages, these files are used to describe the dependencies between software
-packages and how to build projects.
+Em termos simples, se você já trabalhou com JavaScript/Go/Rust/Python, deve estar
+familiarizado com arquivos como `package.json`/`go.mod`/`Cargo.toml`/`pyproject.toml`.
+Nessas linguagens de programação, esses arquivos são usados para descrever as dependências
+entre pacotes de software e como construir projetos.
 
-Similarly, the package managers in these programming languages also use files like
-`package-lock.json`/`go.sum`/`Cargo.lock`/`poetry.lock` to lock the versions of
-dependencies, ensuring the reproducibility of projects.
+Da mesma forma, os gerenciadores de pacotes nessas linguagens de programação também usam
+arquivos como `package-lock.json`/`go.sum`/`Cargo.lock`/`poetry.lock` para bloquear as
+versões das dependências, garantindo a reprodutibilidade dos projetos.
 
-Flakes borrow ideas from these package managers to enhance the reproducibility,
-composability, and usability of the Nix ecosystem.
+Flakes empresta ideias desses gerenciadores de pacotes para aprimorar a reprodutibilidade,
+a componibilidade e a usabilidade do ecossistema Nix.
 
-Flakes introduce `flake.nix`, similar to `package.json`, to describe the dependencies
-between Nix packages and how to build projects. Additionally, it provides `flake.lock`,
-akin to `package-lock.json`, to lock the versions of dependencies, ensuring project
-reproducibility.
+Flakes introduz o `flake.nix`, similar ao `package.json`, para descrever as dependências
+entre pacotes Nix e como construir projetos. Além disso, ele fornece o `flake.lock`,
+semelhante ao `package-lock.json`, para bloquear as versões das dependências, garantindo a
+reprodutibilidade do projeto.
 
-On the other hand, Flakes experimental features did not break Nix's original design at the
-user level. The two new files `flake.nix`/`flake.lock` introduced by Flakes are just a
-wrapper for other Nix configurations. In the following chapters, we will see that Flakes
-features provide a new and more convenient way to manage the dependencies between Nix
-expressions based on Nix's original design.
+Por outro lado, as funcionalidades experimentais dos flakes não quebraram o design
+original do Nix no nível do usuário. Os dois novos arquivos `flake.nix`/`flake.lock`
+introduzidos pelos flakes são apenas um wrapper para outras configurações Nix. Nos
+capítulos seguintes, veremos que as funcionalidades dos flakes fornecem uma nova e mais
+conveniente maneira de gerenciar as dependências entre as expressões Nix com base no
+design original do Nix.
 
-## A Word of Caution about Flakes <Badge type="danger" text="caution" />
+## Uma Palavra de Cautela sobre os Flakes <Badge type="danger" text="caution" />
 
-The benefits of Flakes are evident, and the entire NixOS community has embraced it
-wholeheartedly. Currently, more than half of the users utilize Flakes[^3], providing
-assurance that Flakes will not be deprecated.
+Os benefícios dos flakes são evidentes, e toda a comunidade NixOS os adotou de todo o
+coração. Atualmente, mais da metade dos usuários utiliza flakes[^3], o que nos dá a
+garantia de que os flakes não serão descontinuados.
 
-:warning: However, it's important to note that **Flakes is still an experimental
-feature**. Some issues persist, and there is a possibility of introducing breaking changes
-during the stabilization process. The extent of these breaking changes remains uncertain.
+:warning: No entanto, é importante notar que flakes ainda é uma funcionalidade
+experimental. Alguns problemas persistem, e existe a possibilidade de introduzir mudanças
+breaking changes durante o processo de estabilização. A extensão dessas breaking changes
+ainda é incerta.
 
-Overall, I strongly recommend everyone to use Flakes, especially since this book revolves
-around NixOS and Flakes. However, it's crucial to be prepared for potential problems that
-may arise due to forthcoming breaking changes.
+No geral, eu recomendo fortemente que todos usem flakes, especialmente porque este livro
+gira em torno do NixOS e de flakes. No entanto, é crucial estar preparado para problemas
+potenciais que podem surgir devido a futuras _breaking changes_.
 
-## When Will Flakes Be Stabilized?
+## Quando os Flakes Serão Estabilizados?
 
-I delved into some details regarding Flakes:
+Eu me aprofundei em alguns detalhes sobre os flakes:
 
 - [[RFC 0136] A Plan to Stabilize Flakes and the New CLI Incrementally](https://github.com/NixOS/rfcs/pull/136):
-  A plan to incrementally stabilize Flakes and the new CLI, merged.
-- [CLI stabilization effort](https://github.com/NixOS/nix/issues/7701): An issue tracking
-  the progress of the New CLI stabilization effort.
+  Um plano para estabilizar incrementalmente os flakes e a nova CLI, que foi aceito.
+- [CLI stabilization effort](https://github.com/NixOS/nix/issues/7701): Uma issue que
+  acompanha o progresso do esforço de estabilização da Nova CLI.
 - [Why Are Flakes Still Experimental? - NixOS Discourse](https://discourse.nixos.org/t/why-are-flakes-still-experimental/29317):
-  A post discussing why Flakes are still considered experimental.
+  Um post discutindo por que os flakes ainda são considerados experimentais.
 - [Flakes Are Such an Obviously Good Thing - Graham Christensen](https://grahamc.com/blog/flakes-are-an-obviously-good-thing/):
-  An article emphasizing the advantages of Flakes while suggesting areas for improvement
-  in its design and development process.
+  Um artigo enfatizando as vantagens dos flakes enquanto sugere áreas para melhoria em seu
+  design e processo de desenvolvimento.
 - [ teaching Nix 3 CLI and Flakes #281 - nix.dev](https://github.com/NixOS/nix.dev/issues/281):
-  An issue about "Teaching Nix 3 CLI and Flakes" in nix.dev, and the conclusion is that we
-  should not promote unstable features in nix.dev.
+  Uma issue sobre "Ensinar Nix 3 CLI e Flakes" no nix.dev, cuja conclusão é que não
+  devemos promover funcionalidades instáveis no nix.dev.
 
-After reviewing these resources, it seems that Flakes may be(or may not...) stabilized
-within two years, possibly accompanied by some breaking changes.
+Após analisar esses recursos, parece que os flakes podem ser (ou não...) estabilizados em
+até dois anos, possivelmente acompanhados de algumas breaking changes.
 
-## The New CLI and the Classic CLI
+## A Nova CLI e a CLI Clássica
 
-Nix introduced two experimental features, `nix-command` and `flakes`, in the year 2020.
-These features bring forth a new command-line interface (referred to as the New CLI), a
-standardized Nix package structure definition (known as the Flakes feature), and features
-like `flake.lock`, similar to version lock files in cargo/npm. Despite being experimental
-as of February 1, 2024, these features have gained widespread adoption within the Nix
-community due to their significant enhancement of Nix capabilities.
+O Nix introduziu duas funcionalidades experimentais, `nix-command` e `flakes`, no ano
+de 2020. Essas funcionalidades trouxeram uma nova interface de linha de comando (referida
+como a Nova CLI), uma definição padronizada da estrutura de pacotes Nix (conhecida como a
+funcionalidade Flakes), e funcionalidades como o `flake.lock`, semelhante a arquivos de
+bloqueio de versão em cargo/npm. Apesar de serem experimentais a partir de 1º de fevereiro
+de 2024, essas funcionalidades ganharam ampla adoção dentro da comunidade Nix devido à sua
+significativa melhoria nas capacidades do Nix.
 
-The current Nix New CLI (the `nix-command` experimental feature) is tightly coupled with
-the Flakes experimental feature. While there are ongoing efforts to explicitly separate
-them, using Flakes essentially requires the use of the New CLI. In this book, serving as a
-beginner's guide to NixOS and Flakes, it is necessary to introduce the differences between
-the New CLI, which Flakes relies on, and the old CLI.
+A atual Nova CLI do Nix (a funcionalidade experimental `nix-command`) está fortemente
+acoplada à funcionalidade experimental Flakes. Embora existam esforços em andamento para
+separá-las explicitamente, usar flakes essencialmente exige o uso da Nova CLI. Neste
+livro, que serve como um guia para iniciantes em NixOS e Flakes, é necessário introduzir
+as diferenças entre a Nova CLI, da qual os flakes dependem, e a CLI antiga.
 
-Here, we list the old Nix CLI and related concepts that are no longer needed when using
-the New CLI and Flakes (`nix-command` and `flakes`). When researching, you can replace
-them with the corresponding New CLI commands (except for `nix-collect-garbage`, as there
-is currently no alternative for this command):
+Aqui, listamos a antiga CLI do Nix e os conceitos relacionados que não são mais
+necessários ao usar a Nova CLI e os flakes (`nix-command` e `flakes`). Ao pesquisar, você
+pode substituí-los pelos comandos correspondentes da Nova CLI (exceto para
+`nix-collect-garbage`, já que atualmente não há alternativa para este comando):
 
-1. `nix-channel`: `nix-channel` manages versions of inputs like nixpkgs through
-   stable/unstable channels, similar to the package lists used by other package management
-   tools such as apt/yum/pacman. This is what traditionally provides `<nixpkgs>` in the
-   Nix language.
-   1. In Flakes, the functionality of `nix-channel` is replaced by the Flake Registry
-      (`nix registry`) for providing "some unspecified global version of nixpkgs" for
-      interactive CLI usage (e.g. `nix run nixpkgs#hello`). When using a `flake.nix`,
-      input versions are managed in the flake itself.
-   2. Flakes use the `inputs` section in `flake.nix` to manage versions of nixpkgs and
-      other inputs in each Flake instead of using global state.
-2. `nix-env`: `nix-env` is a core command-line tool for classic Nix used to manage
-   software packages in the user environment.
-   1. It installs packages from the data sources added by `nix-channel`, causing the
-      installed package's version to be influenced by the channel. Packages installed with
-      `nix-env` are not automatically recorded in Nix's declarative configuration and are
-      completely independent of its control, making them challenging to reproduce on other
-      machines. Upgrading packages installed by `nix-env` is slow and may produce
-      unexpected results because the attribute name where the package was found in nixpkgs
-      is not saved.
+1. `nix-channel`: O `nix-channel` gerencia versões de entradas como o nixpkgs através de
+   canais estáveis/instáveis, semelhante às listas de pacotes usadas por outras
+   ferramentas de gerenciamento de pacotes, como apt/yum/pacman. É isso que
+   tradicionalmente fornece o `<nixpkgs>` na linguagem Nix.
+   1. Nos flakes, a funcionalidade do `nix-channel` é substituída pelo Registro de Flakes
+      (`nix registry`) para fornecer "alguma versão global não especificada do nixpkgs"
+      para uso interativo da CLI (por exemplo, `nix run nixpkgs#hello`). Ao usar um
+      `flake.nix`, as versões das entradas são gerenciadas no próprio flake.
+   2. Os flakes usam a seção `inputs` no `flake.nix` para gerenciar as versões do nixpkgs
+      e de outras entradas em cada flake em vez de usar um estado global.
+2. `nix-env`: O `nix-env` é uma ferramenta de linha de comando central para o Nix
+   clássico, usada para gerenciar pacotes de software no ambiente do usuário.
+   1. Ele instala pacotes a partir das fontes de dados adicionadas pelo `nix-channel`,
+      fazendo com que a versão do pacote instalado seja influenciada pelo canal. Pacotes
+      instalados com `nix-env` não são automaticamente registrados na configuração
+      declarativa do Nix e são completamente independentes de seu controle, tornando-os
+      difíceis de reproduzir em outras máquinas. Atualizar pacotes instalados por
+      `nix-env` é lento e pode produzir resultados inesperados porque o nome do atributo
+      onde o pacote foi encontrado no nixpkgs não é salvo.
 
-      Therefore, it is not recommended to use this command directly.
+      Portanto, não é recomendado usar este comando diretamente.
 
-   2. The corresponding command in the New CLI is `nix profile`. Personally, I don't
-      recommend it for beginners.
+   2. O comando correspondente na Nova CLI é o `nix profile`. essoalmente, não o recomendo
+      para iniciantes.
 
-3. `nix-shell`: `nix-shell` creates a temporary shell environment, which is useful for
-   development and testing.
-   1. New CLI: This tool is divided into three sub-commands: `nix develop`, `nix shell`,
-      and `nix run`. We will discuss these three commands in detail in the
-      "[Development](../development/intro.md)" chapter.
-4. `nix-build`: `nix-build` builds Nix packages and places the build results in
-   `/nix/store`, but it does not record them in Nix's declarative configuration.
-   1. New CLI: `nix-build` is replaced by `nix build`.
-5. `nix-collect-garbage`: Garbage collection command used to clean up unused Store Objects
-   in `/nix/store`.
-   1. There is a similar command in the New CLI, `nix store gc --debug`, but it does not
-      clean the profile generations, so there is currently no alternative for this
-      command.
-6. And other less commonly used commands are not listed here.
-   1. You can refer to the detailed command comparison list in
-      [Try to explain nix commands](https://qiita.com/Sumi-Sumi/items/6de9ee7aab10bc0dbead?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en).
+3. `nix-shell`: O `nix-shell` cria um ambiente shell temporário, o que é útil para
+   desenvolvimento e testes.
+   1. Nova CLI: Esta ferramenta é dividida em três subcomandos: `nix develop`,
+      `nix shell`, e `nix run`. Discutiremos esses três comandos em detalhes no capítulo
+      "[Desenvolvimento](../development/intro.md)" chapter.
+4. `nix-build`:O `nix-build` constrói pacotes Nix e coloca os resultados da build em
+   `/nix/store`, mas não os registra na configuração declarativa do Nix.
+   1. Nova CLI: O `nix-build` é substituído pelo `nix build`.
+5. `nix-collect-garbage`: Comando de coleta de lixo usado para limpar Objetos de Store não
+   utilizados em `/nix/store`.
+   1. Existe um comando similar na Nova CLI, `nix store gc --debug`, mas ele não limpa as
+      gerações de perfil, então atualmente não há alternativa para este comando.
+6. E outros comandos menos comumente usados não estão listados aqui.
+   1. Você pode consultar a lista detalhada de comparação de comandos em
+      [Tente explicar os comandos do nix](https://qiita.com/Sumi-Sumi/items/6de9ee7aab10bc0dbead?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en).
 
 [^1]: [Flakes - NixOS Wiki](https://wiki.nixos.org/wiki/Flakes)
 
