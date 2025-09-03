@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress"
 
 export const pt = defineConfig({
   lang: "pt-BR",
-  description: "An unofficial and opinionated book for beginners",
+  description: "Um livro não oficial e com opiniões para iniciantes",
 
   themeConfig: {
     nav: [
@@ -115,7 +115,7 @@ export const pt = defineConfig({
             link: "/best-practices/run-downloaded-binaries-on-nixos.md",
           },
           {
-            text: "Simplificando Commandos Relacionados ao NixOS",
+            text: "Simplificando Comandos Relacionados ao NixOS",
             link: "/best-practices/simplify-nixos-related-commands.md",
           },
           {
@@ -150,7 +150,7 @@ export const pt = defineConfig({
             link: "/other-usage-of-flakes/outputs.md",
           },
           {
-            text: "A Nova Interface de Linha de Commando",
+            text: "A Nova Interface de Linha de Comando",
             link: "/other-usage-of-flakes/the-new-cli.md",
           },
           {

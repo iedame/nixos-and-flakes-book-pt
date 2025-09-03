@@ -150,7 +150,7 @@ function getJSONLD(pageData: PageData) {
   "@type":"WebSite",
   "url":"https:\/\/iedame.github.io\/nixos-and-flakes-book-pt\/",
   "inLanguage":"pt-BR",
-  "description":"Um livro não official e com opiniões para iniciantes",
+  "description":"Um livro não oficial e com opiniões para iniciantes",
   "name":"${pageData.title}"
 }`
   } else if (pageData.relativePath === "zh/index.md") {
