@@ -50,7 +50,7 @@ export const pt = defineConfig({
             link: "/nixos-with-flakes/nixos-with-flakes-enabled.md",
           },
           {
-            text: "Entendendo o flake.nix do NixOS",
+            text: "Entendendo o flake.nix",
             link: "/nixos-with-flakes/nixos-flake-configuration-explained.md",
           },
           {
@@ -93,15 +93,15 @@ export const pt = defineConfig({
         ],
       },
       {
-        text: "Nix Store e Binary Cache",
+        text: "Nix Store e Cache Binário",
         items: [
           { text: "Introdução", link: "/nix-store/intro.md" },
           {
-            text: "Adicionando Servidores de Binary Cache",
+            text: "Adicionando Servidores de Cache Binário",
             link: "/nix-store/add-binary-cache-servers.md",
           },
           {
-            text: "Hospedando seu Próprio Servidor de Binary Cache",
+            text: "Hospedando seu Próprio Servidor de Cache Binário",
             link: "/nix-store/host-your-own-binary-cache-server.md",
           },
         ],
@@ -183,7 +183,7 @@ export const pt = defineConfig({
             link: "/development/cross-platform-compilation.md",
           },
           {
-            text: "Compilação Distribuída",
+            text: "Construção Distribuída",
             link: "/development/distributed-building.md",
           },
           {

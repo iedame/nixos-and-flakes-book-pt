@@ -1,79 +1,88 @@
-# Adding Binary Cache Servers
+# Adicionando Servidores de Cache Binário
 
-We have introduced the concepts of Nix Store and binary cache. Here, we will see how to
-add multiple cache servers to speed up package downloads.
+Já introduzimos os conceitos de Nix Store e cache binário. Agora, veremos como adicionar
+múltiplos servidores de cache para acelerar o download de pacotes.
 
-## Why Add Cache Servers {#why-add-cache-servers}
+## Por que Adicionar Servidores de Cache {#why-add-cache-servers}
 
-Nix provides an official cache server, [https://cache.nixos.org](https://cache.nixos.org),
-which caches build results for most commonly used packages. However, it may not meet all
-users' needs. In the following cases, we need to add additional cache servers:
+O Nix fornece um servidor de cache oficial,
+[https://cache.nixos.org](https://cache.nixos.org), que armazena os resultados de
+construção para a maioria dos pacotes de uso comum. No entanto, ele pode não atender a
+todas as necessidades dos usuários. Nos seguintes casos, precisamos adicionar servidores
+de cache adicionais:
 
-1. Add cache servers for some third-party projects, such as the nix-community cache server
-   [https://nix-community.cachix.org](https://nix-community.cachix.org), which can
-   significantly improve the build speed of these third-party projects.
-1. Add cache server mirror sites closest to the user to speed up downloads.
-1. Add a self-built cache server to speed up the build process of personal projects.
+1. Adicionar servidores de cache para alguns projetos de terceiros, como o servidor de
+   cache da comunidade Nix,
+   [https://nix-community.cachix.org](https://nix-community.cachix.org), o que pode
+   melhorar significativamente a velocidade de construção desses projetos de terceiros.
+1. Adicionar espelhos (mirror sites) de servidores de cache mais próximos do usuário para
+   acelerar os downloads.
+1. Adicionar um servidor de cache próprio para acelerar o processo de construção de
+   projetos pessoais.
 
-## How to Add Cache Servers {#how-to-add-custom-cache-servers}
+## Como Adicionar Servidores de Cache {#how-to-add-custom-cache-servers}
 
-In Nix, you can configure cache servers using the following options:
+No Nix, você pode configurar servidores de cache usando as seguintes opções:
 
 1. [substituters](https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-substituters):
-   It is a string list, and each string is the address of a cache server. Nix will attempt
-   to find caches from these servers in the order specified in the list.
+   É uma lista de strings, e cada string é o endereço de um servidor de cache. O Nix
+   tentará encontrar caches nesses servidores na ordem especificada na lista.
 2. [trusted-public-keys](https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-trusted-public-keys):
-   To prevent malicious attacks, The
+   Para evitar ataques maliciosos, a opção
    [require-sigs](https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-require-sigs)
-   option is enabled by default. Only caches with signatures that can be verified by any
-   public key in `trusted-public-keys` will be used by Nix. Therefore, you need to add the
-   public key corresponding to the `substituters` in `trusted-public-keys`.
-   1. cache mirror's data are directly synchronized from the official cache server.
-      Therefore, their public keys are the same as those of the official cache server, and
-      you can use the public key of the official cache server without additional
-      configuration.
-   2. This entirely trust-based public key verification mechanism transfers the security
-      responsibility to users. If users want to use a third-party cache server to speed up
-      the build process of a certain library, they must take on the corresponding security
-      risks and decide whether to add the public key of that cache server to
-      `trusted-public-keys`. To completely solve this trust issue, Nix has introduced the
-      experimental feature [ca-derivations](https://wiki.nixos.org/wiki/Ca-derivations),
-      which does not depend on `trusted-public-keys` for signature verification.
-      Interested users can explore it further.
+   é habilitada por padrão. Somente caches com assinaturas que podem ser verificadas por
+   qualquer chave pública em `trusted-public-keys` serão usados pelo Nix. Portanto, você
+   precisa adicionar a chave pública correspondente aos `substituters` em
+   `trusted-public-keys`.
+   1. Os dados dos espelhos de cache (cache mirror) são diretamente sincronizados do
+      servidor de cache oficial. Portanto, suas chaves públicas são as mesmas do servidor
+      de cache oficial, e você pode usar a chave pública do servidor de cache oficial sem
+      configuração adicional.
+   2. Este mecanismo de verificação de chave pública completamente baseado em confiança
+      transfere a responsabilidade pela segurança para os usuários. Se os usuários desejam
+      usar um servidor de cache de terceiros para acelerar o processo de construção de uma
+      determinada biblioteca, eles devem assumir os riscos de segurança correspondentes e
+      decidir se adicionam a chave pública desse servidor de cache a
+      `trusted-public-keys`. Para resolver completamente essa questão de confiança, o Nix
+      introduziu o recurso experimental
+      [ca-derivations](https://wiki.nixos.org/wiki/Ca-derivations), que não depende de
+      `trusted-public-keys` para a verificação de assinatura. Usuários interessados podem
+      explorar mais.
 
-You can configure the `substituters` and `trusted-public-keys` parameters in the following
-ways:
+Você pode configurar os parâmetros `substituters` e `trusted-public-keys` das seguintes
+formas:
 
-1. Configure in `/etc/nix/nix.conf`, a global configuration that affects all users.
-   1. You can use `nix.settings.substituters` and `nix.settings.trusted-public-keys` in
-      any NixOS Module to declaratively generate `/etc/nix/nix.conf`.
-2. Configure in the `flake.nix` of a flake project using `nixConfig.substituters`. This
-   configuration only affects the current flake.
-3. Temporarily set through the `--option` parameter of the `nix` command, and this
-   configuration only applies to the current command.
+1. Configurar em `/etc/nix/nix.conf`, uma configuração global que afeta todos os usuários.
+   1. Você pode usar `nix.settings.substituters` e `nix.settings.trusted-public-keys` em
+      qualquer Módulo NixOS para gerar declarativamente o arquivo `/etc/nix/nix.conf`.
+2. Configurar no `flake.nix` de um projeto flake usando `nixConfig.substituters`. Esta
+   configuração afeta apenas o flake atual.
+3. Definir temporariamente através do parâmetro `--option` do comando `nix`, e esta
+   configuração se aplica apenas ao comando atual.
 
-Among these three methods, except for the first global configuration, the other two are
-temporary configurations. If multiple methods are used simultaneously, later
-configurations will directly override earlier ones.
+Entre esses três métodos, exceto a primeira configuração global, os outros dois são
+configurações temporárias. Se múltiplos métodos forem usados simultaneamente, as
+configurações posteriores sobrescreverão diretamente as anteriores.
 
-However, there are security risks in temporarily setting `substituters`, as explained
-earlier regarding the deficiencies of the security verification mechanism based on
-`trusted-public-keys`. To set `substituters` through the second and third methods, you
-need to meet one of the following conditions:
+No entanto, existem riscos de segurança ao definir temporariamente os `substituters`, como
+explicado anteriormente sobre as deficiências do mecanismo de verificação de segurança
+baseado em `trusted-public-keys`. Para definir `substituters` através do segundo e
+terceiro métodos, você precisa atender a uma das seguintes condições:
 
-1. The current user is included in the
+1. O usuário atual está incluído na lista de parâmetros
    [`trusted-users`](https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-trusted-users)
-   parameter list in `/etc/nix/nix.conf`.
-2. The `substituters` specified temporarily via `--option substituters "http://xxx"` are
-   included in the
+   em `/etc/nix/nix.conf`.
+2. Os `substituters` especificados temporariamente via
+   `--option substituters "http://xxx"` estão incluídos na lista de parâmetros
    [`trusted-substituters`](https://nixos.org/manual/nix/stable/command-ref/conf-file#conf-trusted-substituters)
-   parameter list in `/etc/nix/nix.conf`.
+   em `/etc/nix/nix.conf`.
 
-Based on the above information, the following are examples of the three configuration
-methods mentioned earlier.
+Com base nas informações acima, seguem exemplos dos três métodos de configuração
+mencionados.
 
-Firstly, declaratively configure system-level `substituters` and `trusted-public-keys`
-using `nix.settings` in `/etc/nixos/configuration.nix` or any NixOS Module:
+Primeiro, configure declarativamente os `substituters` e `trusted-public-keys` em nível de
+sistema usando `nix.settings` em `/etc/nixos/configuration.nix` ou em qualquer Módulo
+NixOS:
 
 ```nix{7-27}
 {
@@ -83,13 +92,13 @@ using `nix.settings` in `/etc/nixos/configuration.nix` or any NixOS Module:
 
   # ...
   nix.settings = {
-    # given the users in this list the right to specify additional substituters via:
-    #    1. `nixConfig.substituters` in `flake.nix`
-    #    2. command line args `--options substituters http://xxx`
+   # dado aos usuários desta lista o direito de especificar substituters adicionais via:
+    #    1. `nixConfig.substituters` em `flake.nix`
+    #    2. argumentos de linha de comando `--options substituters http://xxx`
     trusted-users = ["ryan"];
 
     substituters = [
-      # cache mirror located in China
+      # espelho de cache localizado na China
       # status: https://mirror.sjtu.edu.cn/
       "https://mirror.sjtu.edu.cn/nix-channels/store"
       # status: https://mirrors.ustc.edu.cn/status/
@@ -99,7 +108,7 @@ using `nix.settings` in `/etc/nixos/configuration.nix` or any NixOS Module:
     ];
 
     trusted-public-keys = [
-      # the default public key of cache.nixos.org, it's built-in, no need to add it here
+      # a chave pública padrão de cache.nixos.org, já está embutida, não precisa adicionar aqui
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
     ];
   };
@@ -107,21 +116,21 @@ using `nix.settings` in `/etc/nixos/configuration.nix` or any NixOS Module:
 }
 ```
 
-The second method is to configure `substituters` and `trusted-public-keys` using
-`nixConfig` in `flake.nix`:
+O segundo método é configurar `substituters` e `trusted-public-keys` usando `nixConfig` no
+`flake.nix`:
 
-> As mentioned earlier, it is essential to configure `nix.settings.trusted-users` in this
-> configuration. Otherwise, the `substituters` we set here will not take effect.
+> Como mencionado, é essencial configurar `nix.settings.trusted-users` nesta configuração.
+> Caso contrário, os `substituters` que definimos aqui não terão efeito.
 
 ```nix{5-23,43-47}
 {
   description = "NixOS configuration of Ryan Yin";
 
-  # the nixConfig here only affects the flake itself, not the system configuration!
+  # o nixConfig aqui afeta apenas o flake em si, não a configuração do sistema!
   nixConfig = {
-    # override the default substituters
+    # sobrescreve os substituters padrão
     substituters = [
-      # cache mirror located in China
+      # espelho de cache localizado na China
       # status: https://mirror.sjtu.edu.cn/
       "https://mirror.sjtu.edu.cn/nix-channels/store"
       # status: https://mirrors.ustc.edu.cn/status/
@@ -129,11 +138,11 @@ The second method is to configure `substituters` and `trusted-public-keys` using
 
       "https://cache.nixos.org"
 
-      # nix community's cache server
+      # servidor de cache da comunidade nix
       "https://nix-community.cachix.org"
     ];
     trusted-public-keys = [
-      # nix community's cache server public key
+      # chave pública do servidor de cache da comunidade nix
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
@@ -141,7 +150,7 @@ The second method is to configure `substituters` and `trusted-public-keys` using
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    # omitting several configurations...
+    # omitindo várias configurações...
   };
 
   outputs = inputs@{
@@ -157,11 +166,11 @@ The second method is to configure `substituters` and `trusted-public-keys` using
           ./configuration.nix
 
           {
-            # given the users in this list the right to specify additional substituters via:
-            #    1. `nixConfig.substituters` in `flake.nix`
+            # dado aos usuários desta lista o direito de especificar substituters adicionais via:
+            #    1. `nixConfig.substituters` em `flake.nix`
             nix.settings.trusted-users = [ "ryan" ];
           }
-          # omitting several configurations...
+          # omitindo várias configurações...
        ];
       };
     };
@@ -169,59 +178,58 @@ The second method is to configure `substituters` and `trusted-public-keys` using
 }
 ```
 
-Finally, the third method involves using the following command to temporarily specify
-`substituters` and `trusted-public-keys` during deployment:
+Finalmente, o terceiro método envolve usar o seguinte comando para especificar
+temporariamente `substituters` e `trusted-public-keys` durante a implantação:
 
 ```bash
 sudo nixos-rebuild switch --option substituters "https://nix-community.cachix.org" --option trusted-public-keys "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
 ```
 
-Choose one of the above three methods for configuration and deployment. After a successful
-deployment, all subsequent packages will preferentially search for caches from domestic
-mirror sources.
+Escolha um dos três métodos acima para configuração e implantação. Após uma implantação
+bem-sucedida, todos os pacotes subsequentes procurarão preferencialmente por caches de
+fontes de espelho (mirror sources) domésticas.
 
-> If your system hostname is not `my-nixos`, you need to modify the name of
-> `nixosConfigurations` in `flake.nix` or use `--flake /etc/nixos#my-nixos` to specify the
-> configuration name.
+> Se o nome do seu sistema (hostname) não for `my-nixos`, você precisa modificar o nome de
+> `nixosConfigurations` em `flake.nix` ou usar `--flake /etc/nixos#my-nixos` para
+> especificar o nome da configuração.
 
-### The `extra-` Prefix for Nix Options Parameters
+### O Prefixo extra- para Parâmetros de Opções do Nix
 
-As mentioned earlier, the `substituters` configured by the three methods will override
-each other, but the ideal situation should be:
+Como mencionado, os `substituters` configurados pelos três métodos se sobrescreverão uns
+aos outros, mas a situação ideal seria:
 
-1. At the system level in `/etc/nix/nix.conf`, configure only the most generic
-   `substituters` and `trusted-public-keys`, such as official cache servers and domestic
-   mirror sources.
-2. In each flake project's `flake.nix`, configure the `substituters` and
-   `trusted-public-keys` specific to that project, such as non-official cache servers like
-   nix-community.
-3. When building a flake project, nix should **merge** the `substituters` and
-   `trusted-public-keys` configured in `flake.nix` and `/etc/nix/nix.conf`.
+1. Em nível de sistema, em `/etc/nix/nix.conf`, configurar apenas os `substituters` e
+   `trusted-public-keys` mais genéricos, como servidores de cache oficiais e fontes de
+   espelho nacionais.
+2. Em cada projeto flake `flake.nix`, configurar os `substituters` e `trusted-public-keys`
+   específicos para esse projeto, como servidores de cache não oficiais da comunidade Nix.
+3. Ao construir um projeto flake, o Nix deveria mesclar os `substituters` e
+   `trusted-public-keys` configurados no `flake.nix` e em `/etc/nix/nix.conf`.
 
-Nix provides the
-[`extra-` prefix](https://nixos.org/manual/nix/stable/command-ref/conf-file.html?highlight=extra#file-format)
-to achieve this **merging** functionality.
+O Nix fornece o
+[prefixo `extra-`](https://nixos.org/manual/nix/stable/command-ref/conf-file.html?highlight=extra#file-format)
+para alcançar essa funcionalidade de mesclagem.
 
-According to the official documentation, if the value of the `xxx` parameter is a list,
-the value of `extra-xxx` will be appended to the end of the `xxx` parameter:
+De acordo com a documentação oficial, se o valor do parâmetro `xxx` for uma lista, o valor
+de `extra-xxx` será anexado ao final do parâmetro `xxx`:
 
-In other words, you can use it like this:
+Em outras palavras, você pode usá-lo assim:
 
 ```nix{7,13,37-60}
 {
   description = "NixOS configuration of Ryan Yin";
 
-  # the nixConfig here only affects the flake itself, not the system configuration!
+  # o nixConfig aqui afeta apenas o flake em si, não a configuração do sistema!
   nixConfig = {
-    # will be appended to the system-level substituters
+    # será anexado aos substituters de nível de sistema
     extra-substituters = [
-      # nix community's cache server
+      # servidor de cache da comunidade nix
       "https://nix-community.cachix.org"
     ];
 
-    # will be appended to the system-level trusted-public-keys
+    # será anexado às chaves públicas confiáveis de nível de sistema
     extra-trusted-public-keys = [
-      # nix community's cache server public key
+      # chave pública do servidor de cache da comunidade nix
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
@@ -229,7 +237,7 @@ In other words, you can use it like this:
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    # omitting several configurations...
+    # omitindo várias configurações...
   };
 
   outputs = inputs@{
@@ -245,14 +253,14 @@ In other words, you can use it like this:
           ./configuration.nix
 
           {
-            # given the users in this list the right to specify additional substituters via:
-            #    1. `nixConfig.substituters` in `flake.nix`
+            # dado aos usuários desta lista o direito de especificar substituters adicionais via:
+            #    1. `nixConfig.substituters` em `flake.nix`
             nix.settings.trusted-users = [ "ryan" ];
 
-            # the system-level substituters & trusted-public-keys
+            # os substituters e chaves públicas confiáveis de nível de sistema
             nix.settings = {
               substituters = [
-                # cache mirror located in China
+                # espelho de cache localizado na China
                 # status: https://mirror.sjtu.edu.cn/
                 "https://mirror.sjtu.edu.cn/nix-channels/store"
                 # status: https://mirrors.ustc.edu.cn/status/
@@ -262,13 +270,13 @@ In other words, you can use it like this:
               ];
 
               trusted-public-keys = [
-                # the default public key of cache.nixos.org, it's built-in, no need to add it here
+                # a chave pública padrão de cache.nixos.org, já está embutida, não precisa adicionar aqui
                 "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
               ];
             };
 
           }
-          # omitting several configurations...
+          # omitindo várias configurações...
        ];
       };
     };
@@ -276,22 +284,22 @@ In other words, you can use it like this:
 }
 ```
 
-## Accelerate Package Downloads via a Proxy Server {#accelerate-package-downloads-via-a-proxy-server}
+## Acelerar Downloads de Pacotes via um Servidor Proxy {#accelerate-package-downloads-via-a-proxy-server}
 
-> Referenced from Issue:
+> Referenciado do Issue:
 > [roaming laptop: network proxy configuration - NixOS/nixpkgs](https://github.com/NixOS/nixpkgs/issues/27535#issuecomment-1178444327)
-> Although it's mentioned earlier that a transparent proxy running on your router or local
-> machine can completely solve the issue of slow package downloads in NixOS, the
-> configuration is rather cumbersome and often requires additional hardware.
+> Embora seja mencionado que um proxy transparente rodando em seu roteador ou máquina
+> local possa resolver completamente a questão da lentidão no download de pacotes no
+> NixOS, a configuração é bastante complicada e muitas vezes requer hardware adicional.
 
-Some users may prefer to directly speed up package downloads by using a HTTP/Socks5 proxy
-running on their machine. Here's how to set it up. Using methods like
-`export HTTPS_PROXY=http://127.0.0.1:7890` in the Terminal will not work because the
-actual work is done by a background process called `nix-daemon`, not by commands directly
-executed in the Terminal.
+Alguns usuários podem preferir acelerar diretamente os downloads de pacotes usando um
+proxy HTTP/Socks5 rodando em sua máquina. Aqui está como configurá-lo. O uso de métodos
+como `export HTTPS_PROXY=http://127.0.0.1:7890` no Terminal não funcionará, pois o
+trabalho real é feito por um processo em segundo plano chamado `nix-daemon`, e não por
+comandos executados diretamente no Terminal.
 
-If you only need to use a proxy temporarily, you can set the proxy environment variables
-with the following commands:
+Se você precisa usar um proxy apenas temporariamente, pode definir as variáveis de
+ambiente do proxy com os seguintes comandos:
 
 ```bash
 sudo mkdir -p /run/systemd/system/nix-daemon.service.d/
@@ -303,26 +311,27 @@ sudo systemctl daemon-reload
 sudo systemctl restart nix-daemon
 ```
 
-After deploying this configuration, you can check if the environment variables have been
-set by running `sudo cat /proc/$(pidof nix-daemon)/environ | tr '\0' '\n'`.
+Após a implantação dessa configuração, você pode verificar se as variáveis de ambiente
+foram definidas executando `sudo cat /proc/$(pidof nix-daemon)/environ | tr '\0' '\n'`.
 
-The settings in `/run/systemd/system/nix-daemon.service.d/override.conf` will be
-automatically deleted when the system restarts, or you can manually delete it and restart
-the nix-daemon service to restore the original settings.
+As configurações em `/run/systemd/system/nix-daemon.service.d/override.conf` serão
+automaticamente excluídas quando o sistema for reiniciado, ou você pode excluí-las
+manualmente e reiniciar o serviço nix-daemon para restaurar as configurações originais.
 
-If you want to permanently set the proxy, it is recommended to save the above commands as
-a shell script and run it each time the system starts. Alternatively, you can use a
-transparent proxy or TUN and other global proxy solutions.
+Se você deseja definir o proxy permanentemente, é recomendado salvar os comandos acima
+como um script de shell e executá-lo a cada inicialização do sistema. Alternativamente,
+você pode usar um proxy transparente ou TUN e outras soluções de proxy global.
 
-> There are also people in the community who permanently set the proxy for nix-daemon in a
-> declarative way using `systemd.services.nix-daemon.environment`. However, if the proxy
-> encounters problems, it will be very troublesome. Nix-daemon will not work properly, and
-> most Nix commands will not run correctly. Moreover, the configuration of systemd itself
-> is set to read-only protection, making it difficult to modify or delete the proxy
-> settings. So, it is not recommended to use this method.
+> Também há pessoas na comunidade que definem permanentemente o proxy para o nix-daemon de
+> forma declarativa usando `systemd.services.nix-daemon.environment`. No entanto, se o
+> proxy encontrar problemas, será muito trabalhoso. O nix-daemon não funcionará
+> corretamente, e a maioria dos comandos Nix não será executada corretamente. Além disso,
+> a configuração do systemd em si é definida com proteção somente leitura, dificultando a
+> modificação ou exclusão das configurações de proxy. Portanto, não é recomendado usar
+> este método.
 
-> When using some commercial or public proxies, you might encounter HTTP 403 errors when
-> downloading from GitHub (as described in
+> Ao usar alguns proxies comerciais ou públicos, você pode encontrar erros HTTP 403 ao
+> baixar do GitHub. (como descrito em
 > [nixos-and-flakes-book/issues/74](https://github.com/ryan4yin/nixos-and-flakes-book/issues/74)).
-> In such cases, you can try changing the proxy server or setting up
-> [access-tokens](https://github.com/NixOS/nix/issues/6536) to resolve the issue.
+> Nesses casos, você pode tentar mudar o servidor proxy ou configurar
+> [access-tokens](https://github.com/NixOS/nix/issues/6536) para resolver o problema.

@@ -1,110 +1,113 @@
-# The combination ability of Flakes and Nixpkgs module system
+# A Capacidade de Combinação dos Flakes com o Sistema de Módulos do Nixpkgs
 
-## Nixpkgs Module Structure Explained {#simple-introduction-to-nixpkgs-module-structure}
+## Estrutura do Módulo Nixpkgs Explicada {#simple-introduction-to-nixpkgs-module-structure}
 
-> The detailed workings of this module system will be introduced in the following
-> [Modularizing NixOS Configuration](./modularize-the-configuration.md) section. Here,
-> we'll just cover some basic knowledge.
+> O funcionamento detalhado deste sistema de módulos será introduzido na seção a seguir
+> [Modularizando a Configuração do NixOS](./modularize-the-configuration.md). Aqui,
+> abordaremos apenas alguns conhecimentos básicos.
 
-You might be wondering why the `/etc/nixos/configuration.nix` configuration file adheres
-to the Nixpkgs Module definition and can be referenced directly within the `flake.nix`.
+Você deve estar se perguntando por que o arquivo de configuração
+`/etc/nixos/configuration.nix` adere à definição de Módulo Nixpkgs e pode ser referenciado
+diretamente dentro do `flake.nix`.
 
-To understand this, we need to first learn about the origin of the Nixpkgs module system
-and its purpose.
+Para entender isso, precisamos primeiro aprender sobre a origem do sistema de módulos do
+Nixpkgs e seu propósito.
 
-All the implementation code of NixOS is stored in the
-[Nixpkgs/nixos](https://github.com/NixOS/nixpkgs/tree/master/nixos) directory, and most of
-these source codes are written in the Nix language. To write and maintain such a large
-amount of Nix code, and to allow users to flexibly customize various functions of their
-NixOS system, a modular system for Nix code is essential.
+Todo o código de implementação do NixOS é armazenado no diretório
+[Nixpkgs/nixos](https://github.com/NixOS/nixpkgs/tree/master/nixos), e a maioria desses
+códigos-fonte é escrita na linguagem Nix. Para escrever e manter uma quantidade tão grande
+de código Nix e para permitir que os usuários personalizem de forma flexível várias
+funções de seu sistema NixOS, um sistema modular para o código Nix é essencial.
 
-This modular system for Nix code is also implemented within the Nixpkgs repository and is
-primarily used for modularizing NixOS system configurations. However, it is also widely
-used in other contexts, such as nix-darwin and home-manager. Since NixOS is built on this
-modular system, it is only natural that its configuration files, including
-`/etc/nixos/configuration.nix`, are Nixpkgs Modules.
+Este sistema modular para o código Nix também é implementado dentro do repositório Nixpkgs
+e é usado principalmente para modularizar as configurações do sistema NixOS. No entanto,
+ele também é amplamente utilizado em outros contextos, como nix-darwin e home-manager.
+Como o NixOS é construído sobre este sistema modular, é natural que seus arquivos de
+configuração, incluindo `/etc/nixos/configuration.nix`, sejam Módulos Nixpkgs.
 
-Before delving into the subsequent content, it's essential to have a basic understanding
-of how this module system operates.
+Antes de nos aprofundarmos no conteúdo subsequente, é essencial ter um entendimento básico
+de como este sistema de módulos opera.
 
-Here's a simplified structure of a Nixpkgs Module:
+Aqui está uma estrutura simplificada de um Módulo Nixpkgs:
 
 ```nix
 {lib, config, options, pkgs, ...}:
 {
-  # Importing other Modules
+  # Importando outros Módulos
   imports = [
     # ...
     ./xxx.nix
   ];
   for.bar.enable = true;
-  # Other option declarations
+  # Outras declarações de opção
   # ...
 }
 ```
 
-The definition is actually a Nix function, and it has five **automatically generated,
-automatically injected, and declaration-free parameters** provided by the module system:
+A definição é na verdade uma função Nix, e ela tem cinco **parâmetros que são gerados e
+injetados automaticamente e sem declaração** pelo **sistema de módulos**:
 
-1. `lib`: A built-in function library included with nixpkgs, offering many practical
-   functions for operating Nix expressions.
-   - For more information, see <https://nixos.org/manual/nixpkgs/stable/#id-1.4>.
-2. `config`: A set of all options' values in the current environment, which will be used
-   extensively in the subsequent section on the module system.
-3. `options`: A set of all options defined in all Modules in the current environment.
-4. `pkgs`: A collection containing all nixpkgs packages, along with several related
-   utility functions.
-   - At the beginner stage, you can consider its default value to be
-     `nixpkgs.legacyPackages."${system}"`, and the value of `pkgs` can be customized
-     through the `nixpkgs.pkgs` option.
-5. `modulesPath`: A parameter available only in NixOS, which is a path pointing to
+1. `lib`: Uma biblioteca de funções embutida incluída com o nixpkgs, oferecendo muitas
+   funções práticas para operar expressões Nix.
+   - Para mais informações, veja <https://nixos.org/manual/nixpkgs/stable/#id-1.4>.
+2. `config`: Um set de valores de todas as opções no ambiente atual, que será usado
+   extensivamente na seção subsequente sobre o sistema de módulos.
+3. `options`: Um set de todas as opções definidas em todos os Módulos no ambiente atual.
+4. `pkgs`: Uma coleção contendo todos os pacotes nixpkgs, juntamente com várias funções
+   utilitárias relacionadas.
+   - Na fase de iniciante, você pode considerar que seu valor padrão é
+     `nixpkgs.legacyPackages."${system}"`, e o valor de `pkgs` pode ser customizado
+     através da opção `nixpkgs.pkgs`.
+5. `modulesPath`: Um parâmetro disponível apenas no NixOS, que é um caminho que aponta
+   para
    [nixpkgs/nixos/modules](https://github.com/NixOS/nixpkgs/tree/nixos-25.05/nixos/modules).
-   - It is defined in
+   - Ele é definido em
      [nixpkgs/nixos/lib/eval-config-minimal.nix#L43](https://github.com/NixOS/nixpkgs/blob/nixos-25.05/nixos/lib/eval-config-minimal.nix#L43).
-   - It is typically used to import additional NixOS modules and can be found in most
-     NixOS auto-generated `hardware-configuration.nix` files.
+   - É tipicamente usado para importar Módulos NixOS adicionais e pode ser encontrado na
+     maioria dos arquivos `hardware-configuration.nix` gerados automaticamente pelo NixOS.
 
-## Passing Non-default Parameters to Submodules {#pass-non-default-parameters-to-submodules}
+## Passando Parâmetros Não Padrão para Submódulos {#pass-non-default-parameters-to-submodules}
 
-If you need to pass other non-default parameters to submodules, you will need to use some
-special methods to manually specify these non-default parameters.
+Se você precisar passar outros parâmetros não padrão para os submódulos, será necessário
+usar alguns métodos especiais para especificar manualmente esses parâmetros não padrão.
 
-The Nixpkgs module system provides two ways to pass non-default parameters:
+O sistema de módulos do Nixpkgs oferece duas maneiras de passar parâmetros não padrão:
 
-1. The `specialArgs` parameter of the `nixpkgs.lib.nixosSystem` function
-2. Using the `_module.args` option in any module to pass parameters
+1. O parâmetro `specialArgs` da função `nixpkgs.lib.nixosSystem`.
+2. Usando a opção `_module.args` em qualquer módulo para passar parâmetros.
 
-The official documentation for these two parameters is buried deep and is vague and hard
-to understand. If readers are interested, I will include the links here:
+A documentação oficial para esses dois parâmetros está profundamente enterrada e é vaga e
+difícil de entender. Se os leitores estiverem interessados, incluirei os links aqui:
 
-1. `specialArgs`: There are scattered mentions related to it in the NixOS Manual and the
-   Nixpkgs Manual.
-   - Nixpkgs Manual: [Module System - Nixpkgs]
-   - NixOS Manual:
+1. `specialArgs`: Existem menções dispersas relacionadas a ele no Manual do NixOS e no
+   Manual do Nixpkgs.
+   - Manual do Nixpkgs: [Module System - Nixpkgs]
+   - Manual do NixOS NixOS:
      [nixpkgs/nixos-25.05/nixos/doc/manual/development/option-types.section.md#L237-L244]
 1. `_module.args`:
-   - NixOS Manual:
+   - Manual do NixOS:
      [Appendix A. Configuration Options](https://nixos.org/manual/nixos/stable/options#opt-_module.args)
-   - Source Code: [nixpkgs/nixos-25.05/lib/modules.nix - _module.args]
+   - Código-fonte: [nixpkgs/nixos-25.05/lib/modules.nix - _module.args]
 
-In short, `specialArgs` and `_module.args` both require an attribute set as their value,
-and they serve the same purpose, passing all parameters in the attribute set to all
-submodules. The difference between them is:
+Em resumo, `specialArgs` e `_module.args` exigem um attribute set como seu valor, e eles
+servem ao mesmo propósito, passando todos os parâmetros no attribute set para todos os
+submódulos. A diferença entre eles é:
 
-1. The `_module.args` option can be used in any module to pass parameters to each other,
-   which is more flexible than `specialArgs`, which can only be used in the
-   `nixpkgs.lib.nixosSystem` function.
-1. `_module.args` is declared within a module, so it must be evaluated after all modules
-   have been evaluated before it can be used. This means that **if you use the parameters
-   passed through `_module.args` in `imports = [ ... ];`, it will result in an
-   `infinite recursion` error**. In this case, you must use `specialArgs` instead.
+1. A opção `_module.args` pode ser usada em qualquer módulo para passar parâmetros uns
+   para os outros, o que é mais flexível do que `specialArgs`, que só pode ser usado na
+   função `nixpkgs.lib.nixosSystem`.
+1. `_module.args` é declarado dentro de um módulo, então ele deve ser avaliado depois que
+   todos os módulos forem avaliados antes de poder ser usado. Isso significa que se você
+   usar os parâmetros passados através de `_module.args` em `imports = [ ... ];`, isso
+   resultará em um erro de `recursão infinita`. Neste caso, você deve usar `specialArgs`
+   em vez disso.
 
-I personally prefer `specialArgs` because it is more straightforward and easier to use,
-and the naming style of `_xxx` makes it feel like an internal thing that is not suitable
-for use in user configuration files.
+Eu, pessoalmente, prefiro `specialArgs` porque é mais direto e fácil de usar, e o estilo
+de nomenclatura de `_xxx` faz com que pareça algo interno que não é adequado para uso em
+arquivos de configuração de usuário.
 
-Suppose you want to pass a certain dependency to a submodule for use. You can use the
-`specialArgs` parameter to pass the `inputs` to all submodules:
+Suponha que você queira passar uma certa dependência para um submódulo para uso. Você pode
+usar o parâmetro `specialArgs` para passar as `inputs` para todos os submódulos:
 
 ```nix{13}
 {
@@ -117,8 +120,8 @@ Suppose you want to pass a certain dependency to a submodule for use. You can us
     nixosConfigurations.my-nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
 
-      # Set all inputs parameters as special arguments for all submodules,
-      # so you can directly use all dependencies in inputs in submodules
+      # Define todos os parâmetros de inputs como argumentos especiais para todos os submódulos,
+      # para que você possa usar diretamente todas as dependências em inputs nos submódulos
       specialArgs = { inherit inputs; };
       modules = [
         ./configuration.nix
@@ -128,7 +131,7 @@ Suppose you want to pass a certain dependency to a submodule for use. You can us
 }
 ```
 
-Or you can achieve the same effect using the `_module.args` option:
+Ou você pode obter o mesmo efeito usando a opção `_module.args`:
 
 ```nix{14}
 {
@@ -142,8 +145,8 @@ Or you can achieve the same effect using the `_module.args` option:
       modules = [
         ./configuration.nix
         {
-          # Set all inputs parameters as special arguments for all submodules,
-          # so you can directly use all dependencies in inputs in submodules
+          # Define todos os parâmetros de inputs como argumentos especiais para todos os submódulos,
+          # para que você possa usar diretamente todas as dependências em inputs nos submódulos
           _module.args = { inherit inputs; };
         }
       ];
@@ -152,45 +155,45 @@ Or you can achieve the same effect using the `_module.args` option:
 }
 ```
 
-Choose one of the two methods above to modify your configuration, and then you can use the
-`inputs` parameter in `/etc/nixos/configuration.nix`. The module system will automatically
-match the `inputs` defined in `specialArgs` and inject it into all submodules that require
-this parameter:
+Escolha um dos dois métodos acima para modificar sua configuração, e então você poderá
+usar o parâmetro `inputs` em `/etc/nixos/configuration.nix`. O sistema de módulos irá
+automaticamente corresponder às `inputs` definidas em `specialArgs` e injetá-las em todos
+os submódulos que exigem este parâmetro:
 
 ```nix{3}
-# Nix will match by name and automatically inject the inputs
-# from specialArgs/_module.args into the third parameter of this function
+# O Nix irá corresponder pelo nome e injetar automaticamente as inputs
+# de specialArgs/_module.args no terceiro parâmetro desta função
 { config, pkgs, inputs, ... }:
 {
   # ...
 }
 ```
 
-The next section will demonstrate how to use `specialArgs`/`_module.args` to install
-system software from other flake sources.
+A próxima seção demonstrará como usar `specialArgs`/`_module.args` para instalar software
+de sistema a partir de outras fontes de flake.
 
-## Installing System Software from Other Flake Sources {#install-system-packages-from-other-flakes}
+## Instalando Software de Sistema a Partir de Outras Fontes de Flake {#install-system-packages-from-other-flakes}
 
-The most common requirement for managing a system is to install software, and we have
-already seen in the previous section how to install packages from the official nixpkgs
-repository using `environment.systemPackages`. These packages all come from the official
-nixpkgs repository.
+O requisito mais comum para gerenciar um sistema é instalar software, e já vimos na seção
+anterior como instalar pacotes do repositório oficial nixpkgs usando
+`environment.systemPackages`. Esses pacotes vêm todos do repositório oficial nixpkgs.
 
-Now, we will learn how to install software packages from other flake sources, which is
-much more flexible than installing directly from nixpkgs. The main use case is to install
-the latest version of a software that is not yet added or updated in Nixpkgs.
+Agora, aprenderemos como instalar pacotes de software a partir de outras fontes de flake,
+o que é muito mais flexível do que instalar diretamente do nixpkgs. O principal caso de
+uso é instalar a versão mais recente de um software que ainda não foi adicionado ou
+atualizado no Nixpkgs.
 
-Taking the Helix editor as an example, here's how to compile and install the master branch
-of Helix directly.
+Tomando o editor Helix como exemplo, aqui está como compilar e instalar diretamente o ramo
+master do Helix.
 
-First, add the helix input data source to `flake.nix`:
+Primeiro, adicione a fonte de dados de entrada do helix ao `flake.nix`:
 
 ```nix{6,12,18}
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
-    # helix editor, use the master branch
+    # editor helix, usar o ramo master
     helix.url = "github:helix-editor/helix/master";
   };
 
@@ -201,8 +204,8 @@ First, add the helix input data source to `flake.nix`:
       modules = [
         ./configuration.nix
 
-        # This module works the same as the `specialArgs` parameter we used above
-        # choose one of the two methods to use
+        # Este módulo funciona da mesma forma que o parâmetro specialArgs que usamos acima
+        # escolha um dos dois métodos para usar
         # { _module.args = { inherit inputs; };}
       ];
     };
@@ -210,7 +213,8 @@ First, add the helix input data source to `flake.nix`:
 }
 ```
 
-Next, you can reference this flake input data source in `configuration.nix`:
+Em seguida, você pode referenciar esta fonte de dados de entrada de flake em
+`configuration.nix`:
 
 ```nix{1,10}
 { config, pkgs, inputs, ... }:
@@ -220,63 +224,64 @@ Next, you can reference this flake input data source in `configuration.nix`:
     git
     vim
     wget
-    # Here, the helix package is installed from the helix input data source
+    # Aqui, o pacote helix é instalado a partir da fonte de dados de entrada helix
     inputs.helix.packages."${pkgs.system}".helix
   ];
   # ...
 }
 ```
 
-Make the necessary changes and deploy with `sudo nixos-rebuild switch`. The deployment
-will take much longer this time because Nix will compile the entire Helix program from
-source.
+Faça as alterações necessárias e implante com `sudo nixos-rebuild switch`. A implantação
+levará muito mais tempo desta vez porque o Nix irá compilar o programa Helix inteiro a
+partir do código-fonte.
 
-After deployment, you can directly test and verify the installation using the `hx` command
-in the terminal.
+Após a implantação, você pode testar e verificar a instalação diretamente usando o comando
+`hx` no terminal.
 
-Additionally, if you just want to try out the latest version of Helix and decide whether
-to install it on your system later, there is a simpler way to do it in one command (but as
-mentioned earlier, compiling from source will take a long time):
+Além disso, se você apenas quiser experimentar a versão mais recente do Helix e decidir se
+a instala em seu sistema mais tarde, há uma maneira mais simples de fazer isso em um único
+comando (mas como mencionado anteriormente, a compilação a partir do código-fonte levará
+muito tempo):
 
 ```bash
 nix run github:helix-editor/helix/master
 ```
 
-We will go into more detail on the usage of `nix run` in the following section
-[Usage of the New CLI](../other-usage-of-flakes/the-new-cli.md).
+Nós nos aprofundaremos mais no uso de `nix run` na seção a seguir
+[Uso da Nova CLI](../other-usage-of-flakes/the-new-cli.md).
 
-## Leveraging Features from Other Flakes Packages
+## Aproveitando Funcionalidades de Outros Pacotes de Flakes
 
-In fact, this is the primary functionality of Flakes — a flake can depend on other flakes,
-allowing it to utilize the features they provide. It's akin to how we incorporate
-functionalities from other libraries when writing programs in TypeScript, Go, Rust, and
-other programming languages.
+Na verdade, esta é a funcionalidade principal dos Flakes — um flake pode depender de
+outros flakes, permitindo-lhe utilizar as funcionalidades que eles fornecem. É como
+incorporamos funcionalidades de outras bibliotecas ao escrever programas em TypeScript,
+Go, Rust e outras linguagens de programação.
 
-The example above, using the latest version from the official Helix Flake, illustrates
-this functionality. More use cases will be discussed later, and here are a few examples
-referenced for future mention:
+O exemplo acima, usando a versão mais recente do Flake oficial do Helix, ilustra esta
+funcionalidade. Mais casos de uso serão discutidos mais tarde, e aqui estão alguns
+exemplos referenciados para menção futura:
 
-- [Getting Started with Home Manager](./start-using-home-manager.md): This introduces the
-  community's Home-Manager as a dependency, enabling direct utilization of the features
-  provided by this Flake.
-- [Downgrading or Upgrading Packages](./downgrade-or-upgrade-packages.md): Here, different
-  versions of Nixpkgs are introduced as dependencies, allowing for flexible selection of
-  packages from various versions of Nixpkgs.
+- [Primeiros Passos com o Home Manager](./start-using-home-manager.md): Isso introduz o
+  Home-Manager da comunidade como uma dependência, permitindo a utilização direta das
+  funcionalidades fornecidas por este Flake.
+- [Fazendo Downgrade ou Upgrade de Pacotes](./downgrade-or-upgrade-packages.md): Aqui,
+  diferentes versões do Nixpkgs são introduzidas como dependências, permitindo uma seleção
+  flexível de pacotes de várias versões do Nixpkgs.
 
-## More Flakes Tutorials
+## Mais Tutoriais sobre Flakes
 
-Up to this point, we have learned how to use Flakes to configure NixOS systems. If you
-have more questions about Flakes or want to learn more in-depth, please refer directly to
-the following official/semi-official documents:
+Até este ponto, aprendemos como usar Flakes para configurar sistemas NixOS. Se você tiver
+mais perguntas sobre Flakes ou quiser aprender de forma mais aprofundada, por favor,
+consulte diretamente os seguintes documentos oficiais/semi-oficiais:
 
-- Nix Flakes's official documentation:
+- Documentação oficial dos Flakes do Nix:
   - [Nix flakes - Nix Manual](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-flake)
   - [Flakes - nix.dev](https://nix.dev/concepts/flakes)
-- A series of tutorials by Eelco Dolstra(The creator of Nix) about Flakes:
+- Uma série de tutoriais de Eelco Dolstra (O criador do Nix) sobre Flakes:
   - [Nix Flakes, Part 1: An introduction and tutorial (Eelco Dolstra, 2020)](https://www.tweag.io/blog/2020-05-25-flakes/)
   - [Nix Flakes, Part 2: Evaluation caching (Eelco Dolstra, 2020)](https://www.tweag.io/blog/2020-06-25-eval-cache/)
   - [Nix Flakes, Part 3: Managing NixOS systems (Eelco Dolstra, 2020)](https://www.tweag.io/blog/2020-07-31-nixos-flakes/)
-- Other useful documents:
+- Outros documentos úteis:
   - [Practical Nix Flakes](https://serokell.io/blog/practical-nix-flakes)
 
 [nix flake - Nix Manual]:

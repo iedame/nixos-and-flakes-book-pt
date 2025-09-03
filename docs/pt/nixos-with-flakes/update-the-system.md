@@ -1,26 +1,26 @@
-# Updating the System
+# Atualizando o Sistema
 
-With Flakes, updating the system is straightforward. Simply execute the following commands
-in `/etc/nixos` or any other location where you keep the configuration:
+Com Flakes, atualizar o sistema é simples. Basta executar os seguintes comandos em
+`/etc/nixos` ou em qualquer outro local onde você mantenha a configuração:
 
-> **NOTE**: The `/etc/nixos` directory is owned by and only writable to `root`. Therefore,
-> if your flake is located in this directory, you'll need to use `sudo` to update any
-> configuration files.
+> **OBSERVAÇÃO**: O diretório `/etc/nixos` pertence e só é gravável pelo `root`. Portanto,
+> se o seu flake estiver localizado neste diretório, você precisará usar o `sudo` para
+> atualizar quaisquer arquivos de configuração.
 
 ```shell
-# Update flake.lock
+# Atualizar o flake.lock
 nix flake update
 
-# Or update only the specific input, such as home-manager:
+# Ou atualizar apenas a entrada específica, como o home-manager:
 nix flake update home-manager
 
-# Apply the updates
+# Aplicar as atualizações
 sudo nixos-rebuild switch --flake .
 
-# Or to update flake.lock & apply with one command (i.e. same as running "nix flake update" before)
+# Ou para atualizar o flake.lock e aplicar com um único comando (ou seja, o mesmo que executar "nix flake update" antes)
 sudo nixos-rebuild switch --recreate-lock-file --flake .
 ```
 
-Occasionally, you may encounter a "sha256 mismatch" error when running
-`nixos-rebuild switch`. This error can be resolved by updating `flake.lock` using
+Ocasionalmente, você pode encontrar um erro de "sha256 mismatch" ao executar
+`nixos-rebuild switch`. Este erro pode ser resolvido atualizando o `flake.lock` usando
 `nix flake update`.

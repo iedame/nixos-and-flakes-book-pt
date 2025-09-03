@@ -1,8 +1,8 @@
-# Kernel Development
+# Desenvolvimento do Kernel
 
-> WIP work in progress
+> Conteúdo em andamento (WIP - work in progress).
 
-An example of kernel development with `flake.nix`.
+Um exemplo de desenvolvimento de kernel com `flake.nix`.
 
 ```nix
 {
@@ -11,7 +11,7 @@ An example of kernel development with `flake.nix`.
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05-small";
 
-    # custom kernel's source
+    # código-fonte do kernel personalizado
     thead-kernel = {
       url = "github:revyos/thead-kernel/lpi4a";
       flake = false;
@@ -32,7 +32,7 @@ An example of kernel development with `flake.nix`.
 
       overlays = [
         (self: super: {
-          # use gcc 13 to compile this custom kernel
+          # usar gcc 13 para compilar este kernel personalizado
           linuxPackages_thead = super.linuxPackagesFor (super.callPackage ./pkgs/kernel {
             src = thead-kernel;
             stdenv = super.gcc13Stdenv;
@@ -54,7 +54,7 @@ An example of kernel development with `flake.nix`.
       };
       modules = [
         {
-          # cross-compile this flake.
+          # compilação cruzada deste flake.
           nixpkgs.crossSystem = {
             system = "riscv64-linux";
           };
@@ -65,27 +65,27 @@ An example of kernel development with `flake.nix`.
       ];
     };
 
-    # use `nix develop .#kernel` to enter the environment with the custom kernel build environment available.
-    # and then use `unpackPhase` to unpack the kernel source code and cd into it.
-    # then you can use `make menuconfig` to configure the kernel.
+    # usar `nix develop .#kernel` para entrar no ambiente com o ambiente de construção do kernel personalizado disponível.
+    # e então usar `unpackPhase` para descompactar o código-fonte do kernel e entrar nele.
+    # então você pode usar `make menuconfig` para configurar o kernel.
     #
-    # problem
-    #   - using `make menuconfig` - Unable to find the ncurses package.
+    # problema
+    #    - usando `make menuconfig` - Não é possível encontrar o pacote ncurses.
     devShells.x86_64-linux.kernel = pkgsKernel.linuxPackages_thead.kernel.dev;
 
-    # use `nix develop .#fhs` to enter the fhs test environment defined here.
+    # usar `nix develop .#fhs` para entrar no ambiente de teste fhs definido aqui.
     devShells.x86_64-linux.fhs = let
       pkgs = import nixpkgs {
         system = "x86_64-linux";
       };
     in
-      # the code here is mainly copied from:
-      #   https://wiki.nixos.org/wiki/Linux_kernel#Embedded_Linux_Cross-compile_xconfig_and_menuconfig
+      # o código aqui é principalmente copiado de:
+      #    https://wiki.nixos.org/wiki/Linux_kernel#Embedded_Linux_Cross-compile_xconfig_and_menuconfig
       (pkgs.buildFHSUserEnv {
         name = "kernel-build-env";
         targetPkgs = pkgs_: (with pkgs_;
           [
-            # we need theses packages to run `make menuconfig` successfully.
+            # precisamos desses pacotes para rodar `make menuconfig` com sucesso.
             pkgconfig
             ncurses
 
@@ -94,7 +94,7 @@ An example of kernel development with `flake.nix`.
           ]
           ++ pkgs.linux.nativeBuildInputs);
         runScript = pkgs.writeScript "init.sh" ''
-          # set the cross-compilation environment variables.
+          # definir as variáveis de ambiente de compilação cruzada.
           export CROSS_COMPILE=riscv64-unknown-linux-gnu-
           export ARCH=riscv
           export PKG_CONFIG_PATH="${pkgs.ncurses.dev}/lib/pkgconfig:"
@@ -105,16 +105,16 @@ An example of kernel development with `flake.nix`.
 }
 ```
 
-With the above `flake.nix`, I can enter the kernel build environment with
-`nix develop .#kernel`, and then use `unpackPhase` to unpack the kernel source code and cd
-into it. But I can't use `make menuconfig` to configure the kernel, because the `ncurses`
-package is missing in this environment.
+Com o `flake.nix` acima, posso entrar no ambiente de construção do kernel com
+`nix develop .#kernel`, e então usar `unpackPhase` para descompactar o código-fonte do
+kernel e entrar no diretório. Mas não consigo usar `make menuconfig` para configurar o
+kernel, porque o pacote `ncurses` está faltando neste ambiente.
 
-To solve this problem, I add a `fhs` environment to install the `ncurses` package and
-other necessary packages, and then I can use `nix develop .#fhs` to enter this environment
-and use `make menuconfig` to configure the kernel.
+Para resolver este problema, eu adiciono um ambiente `fhs` para instalar o pacote
+`ncurses` e outros pacotes necessários, e então posso usar `nix develop .#fhs` para entrar
+neste ambiente e usar `make menuconfig` para configurar o kernel.
 
-## References
+## Referências
 
 - [Linux kernel - NixOS Wiki](https://wiki.nixos.org/wiki/Linux_kernel)
 - https://github.com/jordanisaacs/kernel-module-flake

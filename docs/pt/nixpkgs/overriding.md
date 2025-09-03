@@ -1,33 +1,33 @@
-# Overriding
+# Sobrescrevendo com override
 
-In Nix, you can customize Nix packages in `pkgs` by using the `override` function, which
-allows you to define custom build parameters and returns a new derivation with the
-overridden values. Let's take a look at an example:
+No Nix, você pode customizar pacotes `pkgs` usando a função `override`, que permite
+definir parâmetros de build customizados e retorna uma nova derivation com os valores
+sobrescritos. Vamos dar uma olhada em um exemplo:
 
 ```nix
 pkgs.fcitx5-rime.override { rimeDataPkgs = [ ./rime-data-flypy ]; }
 ```
 
-In the above example, we override the `rimeDataPkgs` parameter of the `fcitx5-rime`
-derivation to use a custom package called `rime-data-flypy`. This creates a new derivation
-where `rimeDataPkgs` is overridden, while other parameters remain unchanged.
+No exemplo acima, sobrescrevemos o parâmetro `rimeDataPkgs` da derivation `fcitx5-rime`
+para usar um pacote customizado chamado `rime-data-flypy`. Isso cria uma nova derivation
+onde `rimeDataPkgs` é sobrescrito, enquanto outros parâmetros permanecem inalterados.
 
-To find out which parameters of a specific package can be overridden, there are a couple
-of approaches you can follow:
+Para descobrir quais parâmetros de um pacote específico podem ser sobrescritos, existem
+algumas abordagens que você pode seguir:
 
-1. Check the source code of the package in the Nixpkgs repository on GitHub, such as
+1. Verifique o código-fonte do pacote no repositório Nixpkgs no GitHub, como
    [`fcitx5-rime.nix`](https://github.com/NixOS/nixpkgs/blob/e4246ae1e7f78b7087dce9c9da10d28d3725025f/pkgs/tools/inputmethods/fcitx5/fcitx5-rime.nix).
-   Make sure to select the appropriate branch, such as `nixos-unstable`, if you are using
-   that branch.
-2. Use the `nix repl -f '<nixpkgs>'` command to open a Nix REPL and then enter
-   `:e pkgs.fcitx5-rime`. This opens the source code of the package in your default
-   editor, where you can see all the parameters of the package. To learn the basic usage
-   of `nix repl`, you can type `:?` to see the help information.
+   Certifique-se de selecionar o ramo apropriado, como `nixos-unstable`, se você estiver
+   usando esse ramo.
+2. Use o comando `nix repl -f '<nixpkgs>'` para abrir um REPL (Read-Eval-Print Loop) Nix
+   e, em seguida, digite `:e pkgs.fcitx5-rime`. Isso abrirá o código-fonte do pacote em
+   seu editor padrão, onde você pode ver todos os parâmetros do pacote. Para aprender o
+   uso básico do `nix repl`, você pode digitar `:?` para ver a informação de ajuda.
 
-By using these methods, you can discover the input parameters of a package and determine
-which ones can be modified using `override`.
+Usando esses métodos, você pode descobrir os parâmetros de entrada de um pacote e
+determinar quais podem ser modificados usando `override`.
 
-For example, let's take a look at the source code of
+Por exemplo, vamos dar uma olhada no código-fonte de
 [pkgs.hello](https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/applications/misc/hello/default.nix):
 
 ```nix
@@ -55,8 +55,8 @@ stdenv.mkDerivation (finalAttrs: {
 })
 ```
 
-In this example, the attributes `pname`, `version`, `src`, and `doCheck` can all be
-overridden using `overrideAttrs`. For instance:
+Neste exemplo, os atributos `pname`, `version`, `src` e `doCheck` podem todos ser
+sobrescritos usando `overrideAttrs`. Por exemplo:
 
 ```nix
 helloWithDebug = pkgs.hello.overrideAttrs (finalAttrs: previousAttrs: {
@@ -64,11 +64,11 @@ helloWithDebug = pkgs.hello.overrideAttrs (finalAttrs: previousAttrs: {
 });
 ```
 
-In the above code, we use `overrideAttrs` to override the `doCheck` attribute, while
-leaving other attributes unchanged.
+No código acima, usamos `overrideAttrs` para sobrescrever o atributo `doCheck`, enquanto
+deixamos os outros atributos inalterados.
 
-You can also override some default attributes defined in `stdenv.mkDerivation` using
-`overrideAttrs`. For example:
+Você também pode sobrescrever alguns atributos padrão definidos em `stdenv.mkDerivation`
+usando `overrideAttrs`. Por exemplo:
 
 ```nix
 helloWithDebug = pkgs.hello.overrideAttrs (finalAttrs: previousAttrs: {
@@ -76,11 +76,11 @@ helloWithDebug = pkgs.hello.overrideAttrs (finalAttrs: previousAttrs: {
 });
 ```
 
-In this case, we override the `separateDebugInfo` attribute, which is defined in
-`stdenv.mkDerivation`, rather than in the source code of `hello`.
+Neste caso, sobrescrevemos o atributo `separateDebugInfo`, que é definido em
+`stdenv.mkDerivation`, e não no código-fonte de `hello`.
 
-To see all the attributes defined in `stdenv.mkDerivation`, you can check its source code
-by using `nix repl -f '<nixpkgs>'` and entering `:e stdenv.mkDerivation`.
+Para ver todos os atributos definidos em `stdenv.mkDerivation`, você pode verificar seu
+código-fonte usando `nix repl -f '<nixpkgs>'` e digitando `:e stdenv.mkDerivation`.
 
-This will open the source code in your default editor. If you're new to using `nix repl`,
-you can type `:?` to see the help information.
+Isso abrirá o código-fonte em seu editor padrão. Se você é novo no uso do `nix repl`, pode
+digitar `:?` para ver a informação de ajuda.

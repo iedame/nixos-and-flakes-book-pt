@@ -1,31 +1,32 @@
-# Development Environments on NixOS
+# Ambientes de Desenvolvimento no NixOS
 
-NixOS's reproducibility makes it ideal for building development environments. However, if
-you're used to other distros, you may encounter problems because NixOS has its own logic.
-We'll briefly explain this below.
+A reprodutibilidade do NixOS o torna ideal para a construção de ambientes de
+desenvolvimento. No entanto, se você está acostumado com outras distribuições (distros),
+pode encontrar problemas porque o NixOS tem sua própria lógica. Explicaremos brevemente
+isso a seguir.
 
-In the following sections, we'll introduce how the development environment works in NixOS.
+Nas seções seguintes, introduziremos como o ambiente de desenvolvimento funciona no NixOS.
 
-## Creating a Custom Shell Environment with `nix shell`
+## Criando um Ambiente de Shell Personalizado com `nix shell`
 
-The simplest way to create a development environment is to use `nix shell`. `nix shell`
-will create a shell environment with the specified Nix package installed.
+A maneira mais simples de criar um ambiente de desenvolvimento é usar o `nix shell`. O
+`nix shell` criará um ambiente de shell com o pacote Nix especificado instalado.
 
-Here's an example:
+Aqui está um exemplo:
 
 ```shell
-# hello is not available
+# hello não está disponível
 › hello
 hello: command not found
 
-# Enter an environment with the 'hello' and `cowsay` package
+# Entrar em um ambiente com os pacotes 'hello' e `cowsay`
 › nix shell nixpkgs#hello nixpkgs#cowsay
 
-# hello is now available
+# hello agora está disponível
 › hello
 Hello, world!
 
-# ponysay is also available
+# cowsay também está disponível
 › cowsay "Hello, world!"
  _______
 < hello >
@@ -37,29 +38,29 @@ Hello, world!
                 ||     ||
 ```
 
-`nix shell` is very useful when you just want to try out some packages or quickly create a
-clean environment.
+O `nix shell` é muito útil quando você apenas quer testar alguns pacotes ou criar
+rapidamente um ambiente limpo.
 
-## Creating a Development Environment
+## Criando um Ambiente de Desenvolvimento
 
-`nix shell` is simple and easy to use, but it's not very flexible, for a more complex
-development environment, we need to use `pkgs.mkShell` and `nix develop`.
+O `nix shell` é simples e fácil de usar, mas não é muito flexível. Para um ambiente de
+desenvolvimento mais complexo, precisamos usar `pkgs.mkShell` e `nix develop`.
 
-We can create a development environment using `pkgs.mkShell { ... }` and open an
-interactive Bash shell of this development environment using `nix develop`.
+Podemos criar um ambiente de desenvolvimento usando `pkgs.mkShell { ... }` e abrir um
+shell Bash interativo desse ambiente de desenvolvimento usando `nix develop`.
 
-To see how `pkgs.mkShell` works, let's take a look at
-[its source code](https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/build-support/mkshell/default.nix).
+Para ver como o `pkgs.mkShell` funciona, vamos dar uma olhada
+[em seu código-fonte](https://github.com/NixOS/nixpkgs/blob/nixos-23.05/pkgs/build-support/mkshell/default.nix).
 
 ```nix
 { lib, stdenv, buildEnv }:
 
-# A special kind of derivation that is only meant to be consumed by the
+# Uma espécie especial de derivação que se destina apenas a ser consumida pelo
 # nix-shell.
 { name ? "nix-shell"
-, # a list of packages to add to the shell environment
+, # uma lista de pacotes a serem adicionados ao ambiente do shell
   packages ? [ ]
-, # propagate all the inputs from the given derivations
+, # propaga todas as entradas das derivações fornecidas
   inputsFrom ? [ ]
 , buildInputs ? [ ]
 , nativeBuildInputs ? [ ]
@@ -99,16 +100,17 @@ stdenv.mkDerivation ({
 
   # ......
 
-  # when distributed building is enabled, prefer to build locally
+  # quando a construção distribuída está habilitada, prefira construir localmente
   preferLocalBuild = true;
 } // rest)
 ```
 
-`pkgs.mkShell { ... }` is a special derivation (Nix package). Its `name`, `buildInputs`,
-and other parameters are customizable, and `shellHook` is a special parameter that will be
-executed when `nix develop` enters the environment.
+`pkgs.mkShell { ... }` é uma derivação (derivation) especial (pacote Nix). Seu `name`,
+`buildInputs` e outros parâmetros são personalizáveis, e `shellHook` é um parâmetro
+especial que será executado quando `nix develop` entrar no ambiente.
 
-Here is a `flake.nix` that defines a development environment with Node.js 18 installed:
+Aqui está um `flake.nix` que define um ambiente de desenvolvimento com o Node.js 18
+instalado:
 
 ```nix
 {
@@ -119,7 +121,7 @@ Here is a `flake.nix` that defines a development environment with Node.js 18 ins
   };
 
   outputs = { self , nixpkgs ,... }: let
-    # system should match the system you are running on
+    # o sistema deve corresponder ao sistema em que você está rodando
     # system = "x86_64-linux";
     system = "x86_64-darwin";
   in {
@@ -128,7 +130,7 @@ Here is a `flake.nix` that defines a development environment with Node.js 18 ins
         inherit system;
       };
     in pkgs.mkShell {
-      # create an environment with nodejs_18, pnpm, and yarn
+      # criar um ambiente com nodejs_18, pnpm e yarn
       packages = with pkgs; [
         nodejs_18
         nodePackages.pnpm
@@ -143,16 +145,17 @@ Here is a `flake.nix` that defines a development environment with Node.js 18 ins
 }
 ```
 
-Create an empty folder, save the above configuration as `flake.nix`, and then execute
-`nix develop` (or more precisely, you can use `nix develop .#default`), the current
-version of nodejs will be outputted, and now you can use `node` `pnpm` `yarn` seamlessly.
+Crie uma pasta vazia, salve a configuração acima como `flake.nix` e, em seguida, execute
+`nix develop` (ou, mais precisamente, você pode usar `nix develop .#default`), A versão
+atual do nodejs será exibida, e agora você pode usar `node`, `pnpm` e `yarn` sem
+problemas.
 
-## Using zsh/fish/... instead of bash
+## Usando zsh/fish/... em vez de bash
 
-`pkgs.mkShell` uses `bash` by default, but you can also use `zsh` or `fish` by add
-`exec <your-shell>` into `shellHook`.
+O `pkgs.mkShell` usa `bash` por padrão, mas você também pode usar `zsh` ou `fish`
+adicionando `exec <your-shell>` no `shellHook`.
 
-Here is an example:
+Aqui está um exemplo:
 
 ```nix
 {
@@ -163,7 +166,7 @@ Here is an example:
   };
 
   outputs = { self , nixpkgs ,... }: let
-    # system should match the system you are running on
+    # o sistema deve corresponder ao sistema em que você está rodando
     # system = "x86_64-linux";
     system = "x86_64-darwin";
   in {
@@ -172,7 +175,7 @@ Here is an example:
         inherit system;
       };
     in pkgs.mkShell {
-      # create an environment with nodejs_18, pnpm, and yarn
+      # criar um ambiente com nodejs_18, pnpm e yarn
       packages = with pkgs; [
         nodejs_18
         nodePackages.pnpm
@@ -189,21 +192,20 @@ Here is an example:
 }
 ```
 
-With the above configuration, `nix develop` will enter the REPL environment of nushell.
+Com a configuração acima, o `nix develop` entrará no ambiente REPL do nushell.
 
-## Creating a Development Environment with `pkgs.runCommand`
+## Criando um Ambiente de Desenvolvimento com `pkgs.runCommand`
 
-The derivation created by `pkgs.mkShell` cannot be used directly, but must be accessed via
-`nix develop`.
+A derivação criada pelo `pkgs.mkShell` não pode ser usada diretamente, mas deve ser
+acessada via `nix develop`.
 
-It is actually possible to create a shell wrapper containing the required packages via
-`pkgs.stdenv.mkDerivation`, which can then be run directly into the environment by
-executing the wrapper.
+É realmente possível criar um wrapper de shell contendo os pacotes necessários via
+`pkgs.stdenv.mkDerivation`, que pode então ser executado diretamente no ambiente.
 
-Using `mkDerivation` directly is a bit cumbersome, and Nixpkgs provides some simpler
-functions to help us create such wrappers, such as `pkgs.runCommand`.
+Usar `mkDerivation` diretamente é um pouco complicado, e o Nixpkgs fornece algumas funções
+mais simples para nos ajudar a criar esses wrappers, como `pkgs.runCommand`.
 
-Example:
+Exemplo:
 
 ```nix
 {
@@ -214,7 +216,7 @@ Example:
   };
 
   outputs = { self , nixpkgs ,... }: let
-    # system should match the system you are running on
+    # o sistema deve corresponder ao sistema em que você está rodando
     # system = "x86_64-linux";
     system = "x86_64-darwin";
   in {
@@ -228,9 +230,9 @@ Example:
           nushell
       ];
     in pkgs.runCommand "dev-shell" {
-      # Dependencies that should exist in the runtime environment
+      # Dependências que devem existir no ambiente de tempo de execução
       buildInputs = packages;
-      # Dependencies that should only exist in the build environment
+      # Dependências que só devem existir no ambiente de construção
       nativeBuildInputs = [ pkgs.makeWrapper ];
     } ''
       mkdir -p $out/bin/
@@ -241,21 +243,21 @@ Example:
 }
 ```
 
-Then execute `nix run .#dev` or `nix shell .#dev --command 'dev-shell'`, you will enter a
-nushell session, where you can use the `node` `pnpm` command normally, and the node
-version is 20.
+Em seguida, execute `nix run .#dev` ou `nix shell .#dev --command 'dev-shell'`, Você
+entrará em uma sessão do nushell, onde poderá usar os comandos `node` e `pnpm`
+normalmente, e a versão do node será a 20.
 
-The wrapper generated in this way is an executable file, which does not actually depend on
-the `nix run` or `nix shell` command.
+O wrapper gerado desta forma é um arquivo executável, que na verdade não depende do
+comando `nix run` ou `nix shell`.
 
-For example, we can directly install this wrapper through NixOS's
-`environment.systemPackages`, and then execute it directly:
+Por exemplo, podemos instalar diretamente este wrapper através do
+`environment.systemPackages` do NixOS e, em seguida, executá-lo diretamente:
 
 ```nix
 {pkgs, lib, ...}:{
 
   environment.systemPackages = [
-    # Install the wrapper into the system
+    # Instalar o wrapper no sistema
     (let
       packages = with pkgs; [
           nodejs_20
@@ -263,9 +265,9 @@ For example, we can directly install this wrapper through NixOS's
           nushell
       ];
     in pkgs.runCommand "dev-shell" {
-      # Dependencies that should exist in the runtime environment
+      # Dependências que devem existir no ambiente de tempo de execução
       buildInputs = packages;
-      # Dependencies that should only exist in the build environment
+      # Dependências que só devem existir no ambiente de construção
       nativeBuildInputs = [ pkgs.makeWrapper ];
     } ''
       mkdir -p $out/bin/
@@ -276,20 +278,20 @@ For example, we can directly install this wrapper through NixOS's
 }
 ```
 
-Add the above configuration to any NixOS Module, then deploy it with
-`sudo nixos-rebuild switch`, and you can enter the development environment directly with
-the `dev-shell` command, which is the special feature of `pkgs.runCommand` compared to
-`pkgs.mkShell`.
+Adicione a configuração acima a qualquer Módulo NixOS, em seguida, implante-a com
+`sudo nixos-rebuild switch`, e você poderá entrar no ambiente de desenvolvimento
+diretamente com o comando `dev-shell`, que é a característica especial de
+`pkgs.runCommand` em comparação com `pkgs.mkShell`.
 
-Related source code:
+Código-fonte relacionado:
 
 - [pkgs/build-support/trivial-builders/default.nix - runCommand](https://github.com/NixOS/nixpkgs/blob/nixos-25.05/pkgs/build-support/trivial-builders/default.nix#L21-L49)
 - [pkgs/build-support/setup-hooks/make-wrapper.sh](https://github.com/NixOS/nixpkgs/blob/nixos-25.05/pkgs/build-support/setup-hooks/make-wrapper.sh)
 
-## Enter the build environment of any Nix package
+## Entrar no Ambiente de Construção de Qualquer Pacote Nix
 
-Now let's take a look at `nix develop`, first read the help document output by
-`nix develop --help`:
+Agora vamos dar uma olhada em `nix develop`. Primeiro, leia a documentação de ajuda
+exibida por `nix develop --help`:
 
 ```
 Name
@@ -300,25 +302,25 @@ Synopsis
 # ......
 ```
 
-It tells us that `nix develop` accepts a parameter `installable`, which means that we can
-enter the development environment of any installable Nix package through it, not just the
-environment created by `pkgs.mkShell`.
+Ele nos diz que `nix develop` aceita um parâmetro `installable`, o que significa que
+podemos entrar no ambiente de desenvolvimento de qualquer pacote Nix instalável através
+dele, não apenas o ambiente criado por `pkgs.mkShell`.
 
-By default, `nix develop` will try to use the following attributes in the flake outputs:
+Por padrão, `nix develop`tentará usar os seguintes atributos nas saídas do flake:
 
 - `devShells.<system>.default`
 - `packages.<system>.default`
 
-If we use `nix develop /path/to/flake#<name>` to specify the flake package address and
-flake output name, then `nix develop` will try the following attributes in the flake
-outputs:
+Se usarmos `nix develop /path/to/flake#<name>` para especificar o endereço do pacote flake
+e o nome da saída do flake, então `nix develop` tentará os seguintes atributos nas saídas
+do flake:
 
 - `devShells.<system>.<name>`
 - `packages.<system>.<name>`
 - `legacyPackages.<system>.<name>`
 
-Now let's try it out. First, test it to confirm that We don't have `c++` `g++` and other
-compilation-related commands in the current environment:
+Agora vamos testá-lo. Primeiro, teste para confirmar que não temos `c++`, `g++` e outros
+comandos relacionados à compilação no ambiente atual:
 
 ```shell
 ryan in 🌐 aquamarine in ~
@@ -330,10 +332,11 @@ ryan in 🌐 aquamarine in ~
 g++: command not found
 ```
 
-Then use `nix develop` to enter the build environment of the `hello` package in `nixpkgs`:
+Em seguida, use `nix develop` para entrar no ambiente de construção do pacote `hello` no
+`nixpkgs`:
 
 ```shell
-# login to the build environment of the package `hello`
+# logar no ambiente de construção do pacote `hello`
 ryan in 🌐 aquamarine in ~
 › nix develop nixpkgs#hello
 
@@ -356,16 +359,16 @@ This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
 
-We can see that the `CXX` environment variable have been set, and the `c++` `g++` and
-other commands can be used normally now.
+Podemos ver que a variável de ambiente `CXX` foi definida e que os comandos `c++`, `g++` e
+outros agora podem ser usados normalmente.
 
-In addition, we can also call every build phase of the `hello` package normally:
+Além disso, também podemos chamar cada fase de construção do pacote `hello` normalmente:
 
-> The default execution order of all build phases of a Nix package is:
+> A ordem de execução padrão de todas as fases de construção de um pacote Nix é:
 > `$prePhases unpackPhase patchPhase $preConfigurePhases configurePhase $preBuildPhases buildPhase checkPhase $preInstallPhases installPhase fixupPhase installCheckPhase $preDistPhases distPhase $postPhases`
 
 ```shell
-# unpack source code
+# descompactar o código-fonte
 ryan in 🌐 aquamarine in /tmp/xxx via ❄️  impure (hello-2.12.1-env)
 › unpackPhase
 unpacking source archive /nix/store/pa10z4ngm0g83kx9mssrqzz30s84vq7k-hello-2.12.1.tar.gz
@@ -379,7 +382,7 @@ hello-2.12.1
 ryan in 🌐 aquamarine in /tmp/xxx via ❄️  impure (hello-2.12.1-env)
 › cd hello-2.12.1/
 
-# generate Makefile
+# gerar Makefile
 ryan in 🌐 aquamarine in /tmp/xxx/hello-2.12.1 via ❄️  impure (hello-2.12.1-env)
 › configurePhase
 configure flags: --prefix=/tmp/xxx/outputs/out --prefix=/tmp/xxx/outputs/out
@@ -402,7 +405,7 @@ config.status: executing po-directories commands
 config.status: creating po/POTFILES
 config.status: creating po/Makefile
 
-# build the package
+# construir o pacote
 ryan in 🌐 aquamarine in /tmp/xxx/hello-2.12.1 via C v12.3.0-gcc via ❄️  impure (hello-2.12.1-env) took 2s
 › buildPhase
 build flags: SHELL=/run/current-system/sw/bin/bash
@@ -414,26 +417,27 @@ gcc  -g -O2   -o hello src/hello.o  ./lib/libhello.a
 make[2]: Leaving directory '/tmp/xxx/hello-2.12.1'
 make[1]: Leaving directory '/tmp/xxx/hello-2.12.1'
 
-# run the built program
+# rodar o programa construído
 ryan in 🌐 aquamarine in /tmp/xxx/hello-2.12.1 via C v12.3.0-gcc via ❄️  impure (hello-2.12.1-env)
 › ./hello
 Hello, world!
 ```
 
-This usage is mainly used to debug the build process of a Nix package, or to execute some
-commands in the build environment of a Nix package.
+Esse uso é principalmente para depurar o processo de construção de um pacote Nix, ou para
+executar alguns comandos no ambiente de construção de um pacote Nix.
 
 ## `nix build`
 
-The `nix build` command is used to build a software package and creates a symbolic link
-named `result` in the current directory, which points to the build result.
+O comando `nix build` é usado para construir um pacote de software e cria um link
+simbólico (symbolic link) chamado `result` no diretório atual, que aponta para o resultado
+da construção.
 
-Here's an example:
+Aqui está um exemplo:
 
 ```bash
-# Build the package 'ponysay' from the 'nixpkgs' flake
+# Construir o pacote 'ponysay' do flake 'nixpkgs'
 nix build "nixpkgs#ponysay"
-# Use the built 'ponysay' command
+# Usar o comando 'ponysay' construído
 › ./result/bin/ponysay 'hey buddy!'
  ____________
 < hey buddy! >
@@ -461,25 +465,25 @@ nix build "nixpkgs#ponysay"
                                 ▀  ▀▀█
 ```
 
-## Using `nix profile` to manage development environments and entertainment environments
+## Usando `nix profile` para gerenciar Ambientes de Desenvolvimento e Ambientes de Entretenimento
 
-`nix develop` is a tool for creating and managing multiple user environments, and switch
-to different environments when needed.
+`nix develop` é uma ferramenta para criar e gerenciar múltiplos ambientes de usuário e
+alternar para diferentes ambientes quando necessário.
 
-Unlike `nix develop`, `nix profile` manages the user's system environment, instead of
-creating a temporary shell environment. So it's more compatible with Jetbrains IDE /
-VSCode and other IDEs, and won't have the problem of not being able to use the configured
-development environment in the IDE.
+Ao contrário do `nix develop`, o `nix profile` gerencia o ambiente de sistema do usuário,
+em vez de criar um ambiente de shell temporário. Portanto, é mais compatível com IDEs como
+JetBrains IDE/VSCode e não terá o problema de não conseguir usar o ambiente de
+desenvolvimento configurado na IDE.
 
-TODO
+TODO: Isso está em andamento. Precisa ser revisado.
 
-## Other Commands
+## Outros Comandos
 
-There are other commands like `nix flake init`, which you can explore in [New Nix
-Commands][New Nix Commands]. For more detailed information, please refer to the
-documentation.
+Existem outros comandos como `nix flake init`, que você pode explorar em [New Nix
+Commands][New Nix Commands]. Para informações mais detalhadas, por favor, consulte a
+documentação.
 
-## References
+## Referências
 
 - [pkgs.mkShell - nixpkgs manual](https://nixos.org/manual/nixpkgs/stable/#sec-pkgs-mkShell)
 - [A minimal nix-shell](https://fzakaria.com/2021/08/02/a-minimal-nix-shell.html)

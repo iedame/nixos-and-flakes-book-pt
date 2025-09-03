@@ -1,29 +1,30 @@
 # Overlays
 
-In the previous section, we learned about overriding derivations by
-`pkgs.xxx.override { ... }` or
-`pkgs.xxx.overrideAttrs (finalAttrs: previousAttrs: { ... });`. However, this approach
-will generate a new derivation and doesn't modify the original derivation in `pkgs`
-instance. If the derivation you want to override is also used by other Nix packages, they
-will still use the unmodified derivation.
+Na seção anterior, aprendemos sobre a sobrescrita de derivations usando
+`pkgs.xxx.override { ... }` ou
+`pkgs.xxx.overrideAttrs (finalAttrs: previousAttrs: { ... });`. No entanto, essa abordagem
+irá gerar uma nova derivation e não modifica a derivation original na instância `pkgs`. Se
+a derivation que você deseja sobrescrever também for usada por outros pacotes Nix, eles
+ainda usarão a derivation não modificada.
 
-To globally modify derivations in the default nixpkgs instance, Nix provides a feature
-called "overlays".
+Para modificar globalmente as derivations na instância nixpkgs padrão, o Nix fornece uma
+funcionalidade chamada "overlays".
 
-In traditional Nix environments, overlays can be configured globally using the
-`~/.config/nixpkgs/overlays.nix` or `~/.config/nixpkgs/overlays/*.nix` files. However,
-with Flakes feature, to ensure system reproducibility, overlays cannot rely on
-configurations outside of the Git repository.
+Em ambientes Nix tradicionais, os overlays podem ser configurados globalmente usando os
+arquivos `~/.config/nixpkgs/overlays.nix` ou `~/.config/nixpkgs/overlays/*.nix`. No
+entanto, com a funcionalidade Flakes, para garantir a reprodutibilidade do sistema, os
+overlays não podem depender de configurações fora do repositório Git.
 
-When using `flake.nix` to configure NixOS, both Home Manager and NixOS provide the
-`nixpkgs.overlays` option to define overlays. You can refer to the following documentation
-for more details:
+Ao usar `flake.nix` para configurar o NixOS, tanto o Home Manager quanto o NixOS fornecem
+a opção `nixpkgs.overlays` para definir overlays. Você pode consultar a seguinte
+documentação para mais detalhes:
 
-- [Home Manager docs - `nixpkgs.overlays`](https://nix-community.github.io/home-manager/options.xhtml#opt-nixpkgs.overlays)
-- [Nixpkgs source code - `nixpkgs.overlays`](https://github.com/NixOS/nixpkgs/blob/30d7dd7e7f2cba9c105a6906ae2c9ed419e02f17/nixos/modules/misc/nixpkgs.nix#L169)
+- [Documentação do Home Manager - `nixpkgs.overlays`](https://nix-community.github.io/home-manager/options.xhtml#opt-nixpkgs.overlays)
+- [Código-fonte do Nixpkgs - `nixpkgs.overlays`](https://github.com/NixOS/nixpkgs/blob/30d7dd7e7f2cba9c105a6906ae2c9ed419e02f17/nixos/modules/misc/nixpkgs.nix#L169)
 
-Let's take a look at an example module that loads overlays. This module can be used as a
-Home Manager module or a NixOS module, as the definitions are the same:
+Vamos dar uma olhada em um exemplo de módulo que carrega overlays. Este módulo pode ser
+usado como um módulo do Home Manager ou como um módulo do NixOS, pois as definições são as
+mesmas:
 
 ```nix
 # ./overlays/default.nix
@@ -31,8 +32,8 @@ Home Manager module or a NixOS module, as the definitions are the same:
 
 {
   nixpkgs.overlays = [
-    # Overlay 1: Use `self` and `super` to express
-    # the inheritance relationship
+    # Overlay 1: Use `self` e `super` para expressar
+    # a relação de herança
     (self: super: {
       google-chrome = super.google-chrome.override {
         commandLineArgs =
@@ -40,8 +41,8 @@ Home Manager module or a NixOS module, as the definitions are the same:
       };
     })
 
-    # Overlay 2: Use `final` and `prev` to express
-    # the relationship between the new and the old
+    # Overlay 2: Use `final` e `prev` para expressar
+    # a relação entre o novo e o antigo
     (final: prev: {
       steam = prev.steam.override {
         extraPkgs = pkgs: with pkgs; [
@@ -60,23 +61,23 @@ Home Manager module or a NixOS module, as the definitions are the same:
       };
     })
 
-    # Overlay 3: Define overlays in other files
-    # The content of ./overlays/overlay3/default.nix is the same as above:
+    # Overlay 3: Definir overlays em outros arquivos
+    # O conteúdo de ./overlays/overlay3/default.nix é o mesmo que acima:
     # `(final: prev: { xxx = prev.xxx.override { ... }; })`
     (import ./overlay3)
   ];
 }
 ```
 
-In the above example, we define three overlays.
+No exemplo acima, definimos três overlays.
 
-1. Overlay 1 modifies the `google-chrome` derivation by adding a command-line argument for
-   a proxy server.
-2. Overlay 2 modifies the `steam` derivation by adding extra packages and environment
-   variables.
-3. Overlay 3 is defined in a separate file `./overlays/overlay3/default.nix`.
+1. O Overlay 1 modifica a derivation `google-chrome` adicionando um argumento de linha de
+   comando para um servidor proxy.
+2. O Overlay 2 modifica a derivation `steam` adicionando pacotes extras e variáveis de
+   ambiente.
+3. O Overlay 3 é definido em um arquivo separado `./overlays/overlay3/default.nix`.
 
-One example of importing the above configuration as a NixOS module is as follows:
+Um exemplo de importação da configuração acima como um módulo NixOS é o seguinte:
 
 ```nix
 # ./flake.nix
@@ -92,7 +93,7 @@ One example of importing the above configuration as a NixOS module is as follows
         modules = [
           ./configuration.nix
 
-          # import the module that contains overlays
+          # importar o módulo que contém os overlays
           (import ./overlays)
         ];
       };
@@ -101,20 +102,22 @@ One example of importing the above configuration as a NixOS module is as follows
 }
 ```
 
-This is just an example. Please write your own overlays according to your needs.
+Isso é apenas um exemplo. Por favor, escreva seus próprios overlays de acordo com suas
+necessidades.
 
-## Multiple nixpkgs Instances with different Overlays
+## Múltiplas Instâncias de nixpkgs com Diferentes Overlays
 
-The `nixpkgs.overlays = [...];` mentioned above directly modifies the global nixpkgs
-instance `pkgs`. If your overlays make changes to some low-level packages, it might impact
-other modules. One downside is an increase in local compilation (due to cache
-invalidation), and there might also be functionality issues with the affected packages.
+O `nixpkgs.overlays = [...];` mencionado acima modifica diretamente a instância global
+`pkgs`. Se seus overlays fizerem alterações em alguns pacotes de baixo nível, isso pode
+impactar outros módulos. Uma desvantagem é o aumento na compilação local (devido à
+invalidação do cache), e também pode haver problemas de funcionalidade com os pacotes
+afetados.
 
-If you wish to utilize overlays only in a specific location without affecting the default
-nixpkgs instance, you can instantiate a new nixpkgs instance and apply your overlays to
-it. We will discuss how to do this in the next section
-[The Ingenious Uses of Multiple nixpkgs Instances](./multiple-nixpkgs.md).
+Se você deseja utilizar overlays apenas em um local específico sem afetar a instância
+nixpkgs padrão, você pode instanciar uma nova instância nixpkgs e aplicar seus overlays a
+ela. Discutiremos como fazer isso na próxima seção
+[Múltiplas Instâncias do Nixpkgs](./multiple-nixpkgs.md).
 
-## References
+## Referências
 
 - [Chapter 3. Overlays - nixpkgs Manual](https://nixos.org/manual/nixpkgs/stable/#chap-overlays)

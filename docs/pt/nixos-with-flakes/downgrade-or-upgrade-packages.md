@@ -1,26 +1,27 @@
-# Downgrading or Upgrading Packages
+# Fazendo Downgrade ou Upgrade de Pacotes
 
-When working with Flakes, you may encounter situations where you need to downgrade or
-upgrade certain packages to address bugs or compatibility issues. In Flakes, package
-versions and hash values are directly tied to the git commit of their flake input. To
-modify the package version, you need to lock the git commit of the flake input.
+Ao trabalhar com Flakes, você pode encontrar situações em que precisa fazer o downgrade ou
+upgrade de certos pacotes para resolver bugs ou problemas de compatibilidade. Em Flakes,
+as versões dos pacotes e os valores de hash estão diretamente vinculados ao commit do Git
+de sua entrada de flake. Para modificar a versão de um pacote, você precisa bloquear o
+commit do Git da entrada de flake.
 
-Here's an example of how you can add multiple nixpkgs inputs, each using a different git
-commit or branch:
+Aqui está um exemplo de como você pode adicionar múltiplas entradas nixpkgs, cada uma
+usando um commit ou ramo diferente do Git:
 
 ```nix{8-13,19-20,27-44}
 {
   description = "NixOS configuration of Ryan Yin";
 
   inputs = {
-    # Default to the nixos-unstable branch
+    # Padrão para o ramo nixos-unstable
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    # Latest stable branch of nixpkgs, used for version rollback
-    # The current latest version is 25.05
+    # Último ramo estável do nixpkgs, usado para rollback de versão
+    # A última versão atual é 25.05
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
 
-    # You can also use a specific git commit hash to lock the version
+    # Você também pode usar um hash de commit específico do git para bloquear a versão
     nixpkgs-fd40cef8d.url = "github:nixos/nixpkgs/fd40cef8d797670e203a27a91e4b8e6decf0b90c";
   };
 
@@ -35,17 +36,14 @@ commit or branch:
       my-nixos = nixpkgs.lib.nixosSystem rec {
         system = "x86_64-linux";
 
-        # The `specialArgs` parameter passes the
-        # non-default nixpkgs instances to other nix modules
+        # O parâmetro specialArgs passa as instâncias nixpkgs não padrão para outros módulos nix
         specialArgs = {
-          # To use packages from nixpkgs-stable,
-          # we configure some parameters for it first
+          # Para usar pacotes do nixpkgs-stable,
+          # primeiro configuramos alguns parâmetros para ele
           pkgs-stable = import nixpkgs-stable {
-            # Refer to the `system` parameter from
-            # the outer scope recursively
+            # Referir-se ao parâmetro system do escopo externo recursivamente
             inherit system;
-            # To use Chrome, we need to allow the
-            # installation of non-free software.
+            # Para usar o Chrome, precisamos permitir a instalação de software não livre.
             config.allowUnfree = true;
           };
           pkgs-fd40cef8d = import nixpkgs-fd40cef8d {
@@ -57,7 +55,7 @@ commit or branch:
         modules = [
           ./hosts/my-nixos
 
-          # Omit other configurations...
+          # Omitir outras configurações...
         ];
       };
     };
@@ -65,59 +63,59 @@ commit or branch:
 }
 ```
 
-In the above example, we have defined multiple nixpkgs inputs: `nixpkgs`,
-`nixpkgs-stable`, and `nixpkgs-fd40cef8d`. Each input corresponds to a different git
-commit or branch.
+No exemplo acima, definimos múltiplas entradas nixpkgs: `nixpkgs`, `nixpkgs-stable` e
+`nixpkgs-fd40cef8d`. Cada entrada corresponde a um commit ou ramo diferente do Git.
 
-Next, you can refer to the packages from `pkgs-stable` or `pkgs-fd40cef8d` within your
-submodule. Here's an example of a Home Manager submodule:
+Em seguida, você pode referenciar os pacotes de `pkgs-stable` ou `pkgs-fd40cef8d` dentro
+do seu submódulo. Aqui está um exemplo de um submódulo do Home Manager:
 
 ```nix{4-7,13,25}
 {
   pkgs,
   config,
-  # Nix will search for and inject this parameter
-  # from `specialArgs` in `flake.nix`
+  # O Nix irá procurar e injetar este parâmetro
+  # de specialArgs em flake.nix
   pkgs-stable,
   # pkgs-fd40cef8d,
   ...
 }:
 
 {
-  # Use packages from `pkgs-stable` instead of `pkgs`
+  # Use pacotes de `pkgs-stable` em vez de `pkgs`
   home.packages = with pkgs-stable; [
     firefox-wayland
 
-    # Chrome Wayland support was broken on the nixos-unstable branch,
-    # so we fallback to the stable branch for now.
-    # Reference: https://github.com/swaywm/sway/issues/7562
+    # O suporte ao Chrome Wayland estava quebrado no ramo nixos-unstable,
+    # então voltamos para o ramo estável por enquanto.
+    # Referência: https://github.com/swaywm/sway/issues/7562
     google-chrome
   ];
 
   programs.vscode = {
     enable = true;
-    # Refer to vscode from `pkgs-stable` instead of `pkgs`
+    # Referir-se ao vscode de `pkgs-stable` em vez de `pkgs`
     package = pkgs-stable.vscode;
   };
 }
 ```
 
-## Pinning a package version with an overlay
+## Fixando a versão de um pacote com um overlay
 
-The above approach is perfect for application packages, but sometimes you need to replace
-libraries used by those packages. This is where [Overlays](../nixpkgs/overlays.md) shine!
-Overlays can edit or replace any attribute of a package, but for now we'll just pin a
-package to a different nixpkgs version. The main disadvantage of editing a dependency with
-an overlay is that your Nix installation will recompile all installed packages that depend
-on it, but your situation may require it for specific bug fixes.
+A abordagem acima é perfeita para pacotes de aplicação, mas às vezes você precisa
+substituir bibliotecas usadas por esses pacotes. É aqui que os
+[Overlays](../nixpkgs/overlays.md) brilham! Os Overlays podem editar ou substituir
+qualquer atributo de um pacote, mas por enquanto vamos apenas fixar um pacote a uma versão
+diferente do nixpkgs. A principal desvantagem de editar uma dependência com um overlay é
+que sua instalação Nix irá recompilar todos os pacotes instalados que dependem dela, mas
+sua situação pode exigir isso para correções de bugs específicos.
 
 ```nix
 # overlays/mesa.nix
 { config, pkgs, lib, pkgs-fd40cef8d, ... }:
 {
   nixpkgs.overlays = [
-    # Overlay: Use `self` and `super` to express
-    # the inheritance relationship
+    # Overlay: Use `self` e `super` para expressar
+    # a relação de herança
     (self: super: {
       mesa = pkgs-fd40cef8d.mesa;
     })
@@ -125,15 +123,15 @@ on it, but your situation may require it for specific bug fixes.
 }
 ```
 
-## Applying the new configuration
+## Aplicando a nova configuração
 
-By adjusting the configuration as shown above, you can deploy it using
-`sudo nixos-rebuild switch`. This will downgrade your Firefox/Chrome/VSCode versions to
-the ones corresponding to `nixpkgs-stable` or `nixpkgs-fd40cef8d`.
+Ao ajustar a configuração conforme mostrado acima, você pode implantá-la usando
+`sudo nixos-rebuild switch`. Isso fará o downgrade das suas versões do
+Firefox/Chrome/VSCode para as correspondentes a `nixpkgs-stable` ou `nixpkgs-fd40cef8d`.
 
-> According to
-> [1000 instances of nixpkgs](https://discourse.nixos.org/t/1000-instances-of-nixpkgs/17347),
-> it's not a good practice to use `import` in submodules or subflakes to customize
-> `nixpkgs`. Each `import` creates a new instance of nixpkgs, which increases build time
-> and memory usage as the configuration grows. To avoid this problem, we create all
-> nixpkgs instances in `flake.nix`.
+> De acordo com
+> [1000 instâncias de nixpkgs](https://discourse.nixos.org/t/1000-instances-of-nixpkgs/17347),
+> não é uma boa prática usar `import` em submódulos ou subflakes para personalizar o
+> `nixpkgs`. Cada `import` cria uma nova instância do nixpkgs, o que aumenta o tempo de
+> build e o uso de memória à medida que a configuração cresce. Para evitar esse problema,
+> criamos todas as instâncias do nixpkgs em `flake.nix`.

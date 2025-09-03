@@ -1,53 +1,55 @@
-# Distributed Building
+# Construção Distribuída
 
-Distributed building can significantly speed up the build process by utilizing multiple
-machines. However, for ordinary NixOS users, distributed building may not be very useful
-since `cache.nixos.org` provides a vast majority of caches for the `x86_64` architecture.
+A construção distribuída pode acelerar significativamente o processo de construção
+utilizando múltiplas máquinas. No entanto, para usuários comuns do NixOS, a construção
+distribuída pode não ser muito útil, já que o `cache.nixos.org` fornece a grande maioria
+dos caches para a arquitetura `x86_64`.
 
-Distributed building is particularly valuable in scenarios where no cache is available,
-such as:
+A construção distribuída é particularmente valiosa em cenários onde nenhum cache está
+disponível, tais como:
 
-1. Users of `RISC-V` or `ARM64` architectures, especially `RISC-V`, as there are very few
-   caches for these architectures in the official cache repository. Local compilation is
-   often required.
-2. Users who heavily customize their systems. The packages in the official cache
-   repository are built with default configurations. If you modify the build parameters,
-   the official cache is not applicable, and local compilation is necessary. For example,
-   in embedded scenarios, customization of the underlying kernel, drivers, etc., is often
-   required, leading to the need for local compilation.
+1. Usuários de arquiteturas `RISC-V` ou `ARM64`, , especialmente `RISC-V`, pois há muito
+   poucos caches para essas arquiteturas no repositório de cache oficial. A compilação
+   local é frequentemente necessária.
+2. Usuários que personalizam bastante seus sistemas. Os pacotes no repositório de cache
+   oficial são construídos com configurações padrão. Se você modificar os parâmetros de
+   construção, o cache oficial não é aplicável, e a compilação local é necessária. Por
+   exemplo, em cenários de sistemas embarcados (embedded scenarios), a personalização do
+   kernel subjacente, drivers, etc., é frequentemente exigida, levando à necessidade de
+   compilação local.
 
-## Configuring Distributed Building
+## Configurando a Construção Distribuída
 
-Currently, there is no official documentation for distributed building. However, I have
-provided a sample distributed build configuration (a NixOS module) below, along with some
-recommended reference documents at the end of this section.
+Atualmente, não há documentação oficial para a construção distribuída. No entanto, forneci
+um exemplo de configuração de construção distribuída (um módulo NixOS) abaixo, junto com
+alguns documentos de referência recomendados no final desta seção.
 
 ```nix
 { ... }: {
 
   ####################################################################
   #
-  #  NixOS's Configuration for Remote Building / Distributed Building
+  #  Configuração do NixOS para Construção Remota / Construção Distribuída
   #
   ####################################################################
 
-  # Set local's max-jobs to 0 to force remote building (disable local building).
+  # Definir o max-jobs local para 0 para forçar a construção remota (desabilitar a construção local).
   # nix.settings.max-jobs = 0;
   nix.distributedBuilds = true;
   nix.buildMachines =
     let
       sshUser = "ryan";
-      # Path to the SSH key on the local machine.
+      # Caminho para a chave SSH na máquina local.
       sshKey = "/home/ryan/.ssh/ai-idols";
       systems = [
-        # Native architecture.
+        # Arquitetura nativa.
         "x86_64-linux"
 
-        # Emulated architecture using binfmt_misc and qemu-user.
+        # Arquitetura emulada usando binfmt_misc e qemu-user.
         "aarch64-linux"
         "riscv64-linux"
       ];
-      # All available system features are poorly documented here:
+      # Todos os recursos de sistema disponíveis estão mal documentados aqui:
       # https://github.com/NixOS/nix/blob/e503ead/src/libstore/globals.hh#L673-L687
       supportedFeatures = [
         "benchmark"
@@ -56,22 +58,22 @@ recommended reference documents at the end of this section.
       ];
     in
       [
-        # Nix seems to always prioritize remote building.
-        # To make use of the local machine's high-performance CPU, do not set the remote builder's maxJobs too high.
+        # O Nix parece sempre priorizar a construção remota.
+        # Para aproveitar a CPU de alto desempenho da máquina local, não defina o maxJobs do construtor remoto muito alto.
         {
-          # Some of my remote builders are running NixOS
-          # and have the same sshUser, sshKey, systems, etc.
+          # Alguns dos meus construtores remotos estão rodando NixOS
+          # e têm o mesmo sshUser, sshKey, systems, etc.
           inherit sshUser sshKey systems supportedFeatures;
 
-          # The hostName should be:
-          #   1. A hostname that can be resolved by DNS.
-          #   2. The IP address of the remote builder.
-          #   3. A host alias defined globally in /etc/ssh/ssh_config.
+          # O hostName deve ser:
+          #    1. Um nome de host que pode ser resolvido por DNS.
+          #    2. O endereço IP do construtor remoto.
+          #    3. Um alias de host definido globalmente em /etc/ssh/ssh_config.
           hostName = "aquamarine";
-          # Remote builder's max-jobs.
+          # max-jobs do construtor remoto.
           maxJobs = 3;
-          # SpeedFactor is a signed integer,
-          # but it seems that it's not used by Nix and has no effect.
+          # speedFactor é um número inteiro com sinal,
+          # mas parece que não é usado pelo Nix e não tem efeito.
           speedFactor = 1;
         }
         {
@@ -87,13 +89,13 @@ recommended reference documents at the end of this section.
           speedFactor = 1;
         }
       ];
-  # Optional: Useful when the builder has a faster internet connection than yours.
+  # Opcional: Útil quando o construtor tem uma conexão de internet mais rápida que a sua.
 	nix.extraOptions = ''
 		builders-use-substitutes = true
 	'';
 
-  # Define the host aliases for remote builders.
-  # This configuration will be written to /etc/ssh/ssh_config.
+  # Definir os aliases de host para construtores remotos.
+  # Esta configuração será escrita em /etc/ssh/ssh_config.
   programs.ssh.extraConfig = ''
     Host ai
       HostName 192.168.5.100
@@ -112,8 +114,8 @@ recommended reference documents at the end of this section.
       Port 22
   '';
 
-  # Define the host keys for remote builders so that Nix can verify all the remote builders.
-  # This configuration will be written to /etc/ssh/ssh_known_hosts.
+  # Definir as chaves de host para construtores remotos para que o Nix possa verificar todos os construtores remotos.
+  # Esta configuração será escrita em /etc/ssh/ssh_known_hosts.
   programs.ssh.knownHosts = {
     # 星野 愛久愛海, Hoshino Aquamarine
     aquamarine = {
@@ -136,20 +138,22 @@ recommended reference documents at the end of this section.
 }
 ```
 
-## Limitations
+## Limitações
 
-Here are some observed issues and limitations:
+Aqui estão alguns problemas e limitações observados:
 
-1. You cannot specify which hosts to use at build time. You can only specify a list of
-   hosts in the configuration file, and Nix automatically selects available hosts.
-2. When choosing a host, Nix always prefers the remote host over the local host, even if
-   the local host has better performance. This can result in underutilization of the local
-   host's CPU.
-3. The smallest unit of distributed building is a derivation. When building large
-   packages, other machines may remain idle for a long time, waiting for the large package
-   to be built. This can lead to resource wastage.
+1. Você não pode especificar quais hosts usar no momento da construção. Você só pode
+   especificar uma lista de hosts no arquivo de configuração, e o Nix seleciona
+   automaticamente os hosts disponíveis.
+2. Ao escolher um host, o Nix sempre prefere o host remoto em relação ao host local, mesmo
+   que o host local tenha um desempenho melhor. Isso pode resultar na subutilização da CPU
+   do host local.
+3. A menor unidade de construção distribuída é uma derivação (derivation). Ao construir
+   pacotes grandes, outras máquinas podem permanecer ociosas por um longo período,
+   esperando que o pacote grande seja construído. Isso pode levar ao desperdício de
+   recursos.
 
-## References
+## Referências
 
 - [Distributed build - NixOS Wiki](https://wiki.nixos.org/wiki/Distributed_build)
 - [Document available system features - nix#7380](https://github.com/NixOS/nix/issues/7380)
