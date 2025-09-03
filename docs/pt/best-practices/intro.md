@@ -1,12 +1,12 @@
-# Best Practices
+# Boas Práticas
 
-Nix is a powerful and flexible tool that offers various approaches to accomplish tasks,
-which can sometimes make it challenging to determine the most suitable method for a
-particular job. To assist you in navigating through this vast ecosystem, I have compiled
-some best practices that I've learned from the community. I hope these practices prove
-helpful to you.
+O Nix é uma ferramenta poderosa e flexível que oferece várias abordagens para realizar
+tarefas, o que às vezes pode tornar desafiador determinar o método mais adequado para uma
+determinada tarefa. Para ajudar você a navegar por este vasto ecossistema, compilei
+algumas boas práticas que aprendi com a comunidade. Espero que essas práticas sejam úteis
+para você.
 
-## References
+## Referências
 
 - [Tips&Tricks for NixOS Desktop - NixOS
   Discourse][Tips&Tricks for NixOS Desktop - NixOS Discourse]

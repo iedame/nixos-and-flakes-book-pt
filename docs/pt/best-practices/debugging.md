@@ -1,87 +1,89 @@
-# Debugging Derivations and Nix Expressions
+# Depurando Derivations e Nix Expressions
 
-## Show detailed error messages
+## Exibir mensagens de erro detalhadas
 
-You can always try to add `--show-trace --print-build-logs --verbose` to the
-`nixos-rebuild` command to get the detailed error message if you encounter any errors
-during the deployment. e.g.
+Você pode sempre tentar adicionar `--show-trace --print-build-logs --verbose` ao comando
+`nixos-rebuild` para obter a mensagem de erro detalhada se encontrar algum problema
+durante o deployment. Por exemplo:
 
 ```bash
 cd /etc/nixos
 sudo nixos-rebuild switch --flake .#myhost --show-trace --print-build-logs --verbose
 
-# A more concise version
+# Versão mais concisa
 sudo nixos-rebuild switch --flake .#myhost --show-trace -L -v
 ```
 
-## Debugging with `nix repl`
+## Depurando com `nix repl`
 
-> NOTE: If you have disabled `NIX_PATH`, you won't be able to use syntax like `<nixpkgs>`.
-> Instead, you should use `nix repl -f flake:nixpkgs` to load nixpkgs.
+> NOTA: Se você desabilitou o `NIX_PATH`, você não conseguirá usar a sintaxe como
+> `<nixpkgs>`. Em vez disso, você deve usar `nix repl -f flake:nixpkgs` para carregar o
+> nixpkgs.
 
-We have frequently used nix repl `<nixpkgs>` throughout this guide to examine the source
-code. It is a powerful tool that helps us understand how things work in Nix.
+Usamos frequentemente o nix repl `<nixpkgs>` ao longo deste guia para examinar o
+código-fonte. É uma ferramenta poderosa que nos ajuda a entender como as coisas funcionam
+no Nix.`
 
-Let's take a closer look at the help message of nix repl:
+Vamos dar uma olhada mais de perto na mensagem de ajuda do nix repl:
 
 ```shell
 › nix repl -f '<nixpkgs>'
-Welcome to Nix 2.13.3. Type :? for help.
+Bem-vindo(a) ao Nix 2.13.3. Digite :? para ajuda.
 
-Loading installable ''...
-Added 17755 variables.
+Carregando instalável ''...
+Adicionadas 17755 variáveis.
 nix-repl> :?
-The following commands are available:
+Os seguintes comandos estão disponíveis:
 
-  <expr>        Evaluate and print expression
-  <x> = <expr>  Bind expression to variable
-  :a <expr>     Add attributes from resulting set to scope
-  :b <expr>     Build a derivation
-  :bl <expr>    Build a derivation, creating GC roots in the working directory
-  :e <expr>     Open package or function in $EDITOR
-  :i <expr>     Build derivation, then install result into current profile
-  :l <path>     Load Nix expression and add it to scope
-  :lf <ref>     Load Nix flake and add it to scope
-  :p <expr>     Evaluate and print expression recursively
-  :q            Exit nix-repl
-  :r            Reload all files
-  :sh <expr>    Build dependencies of derivation, then start nix-shell
-  :t <expr>     Describe result of evaluation
-  :u <expr>     Build derivation, then start nix-shell
-  :doc <expr>   Show documentation of a builtin function
-  :log <expr>   Show logs for a derivation
-  :te [bool]    Enable, disable or toggle showing traces for errors
+  <expr>        Avaliar e exibir expressão
+  <x> = <expr>  Associar expressão a uma variável
+  :a <expr>     Adicionar atributos do conjunto resultante ao escopo
+  :b <expr>     Construir uma derivação
+  :bl <expr>    Construir uma derivação, criando raízes de GC no diretório de trabalho
+  :e <expr>     Abrir pacote ou função no $EDITOR
+  :i <expr>     Construir derivação, depois instalar o resultado no perfil atual
+  :l <path>     Carregar expressão do Nix e adicioná-la ao escopo
+  :lf <ref>     Carregar o Nix flake e adicioná-lo ao escopo
+  :p <expr>     Avaliar e exibir expressão recursivamente
+  :q            Sair do nix-repl
+  :r            Recarregar todos os arquivos
+  :sh <expr>    Construir as dependências da derivação e, depois, iniciar o nix-shell
+  :t <expr>     Descrever resultado da avaliação
+  :u <expr>     Construir a derivação, depois iniciar o nix-shell
+  :doc <expr>   Exibir documentação de uma função embutida
+  :log <expr>   Exibir logs de uma derivação
+  :te [bool]    Habilitar, desabilitar ou alternar a exibição de rastros para erros
 ```
 
-There are a couple of expressions that I frequently use: `:lf <ref>` and `:e <expr>`.
+Existem algumas expressões que uso frequentemente: `:lf <ref>` e `:e <expr>`.
 
-The `:e <expr>` command is very intuitive, so I won't go into detail about it. Instead,
-let's focus on `:lf <ref>`:
+O comando `:e <expr>` é muito intuitivo, então não vou entrar em detalhes sobre ele. Em
+vez disso, vamos focar em `:lf <ref>`:
 
 ```nix
-# cd into my nix-config repo(you should replace it with your own nix-config repo)
+# mude para o diretório do seu repositório nix-config
 › cd ~/nix-config/
 
-# enter nix repl
+# inicie nix repl
 › nix repl
 Welcome to Nix 2.13.3. Type :? for help.
 
-# load my nix flake and add it to scope
+# carregue o meu nix flake e adicione-o ao escopo
 nix-repl> :lf .
 Added 16 variables.
 
-# press <TAB> to see what we have in scope
+# pressione <TAB> para ver o que temos no escopo
 nix-repl><TAB>
-# ......omit some outputs
+# ......omitindo algumas saídas (outputs)
 __isInt                          nixosConfigurations
 __isList                         null
 __isPath                         outPath
 __isString                       outputs
 __langVersion                    packages
-# ......omit some outputs
+# ......omitindo algumas saídas (outputs)
 
 
-# check what's in inputs
+# verificar o que há em inputs
 nix-repl> inputs.<TAB>
 inputs.agenix            inputs.nixpkgs
 inputs.darwin            inputs.nixpkgs-darwin
@@ -90,14 +92,14 @@ inputs.hyprland          inputs.nixpkgs-wayland
 inputs.nil
 inputs.nixos-generators
 
-# check what's in inputs.nil
+# verificar o que há em inputs.nil
 nix-repl> inputs.nil.packages.
 inputs.nil.packages.aarch64-darwin
 inputs.nil.packages.aarch64-linux
 inputs.nil.packages.x86_64-darwin
 inputs.nil.packages.x86_64-linux
 
-# check the outputs of my nix flake
+# verificar as saídas do meu nix flake
 nix-repl> outputs.nixosConfigurations.<TAB>
 outputs.nixosConfigurations.ai
 outputs.nixosConfigurations.aquamarine
@@ -122,7 +124,7 @@ outputs.nixosConfigurations.ai.config.assertions
 outputs.nixosConfigurations.ai.config.boot
 outputs.nixosConfigurations.ai.config.console
 outputs.nixosConfigurations.ai.config.containers
-# ......omit other outputs
+# ......omitindo algumas saídas (outputs)
 
 nix-repl> outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.<TAB>
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.activation
@@ -135,7 +137,7 @@ outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.extraBuilderC
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.extraOutputsToInstall
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.extraProfileCommands
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.file
-# ......omit other outputs
+# ......omitindo algumas saídas (outputs)
 
 
 nix-repl> outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.sessionVariables.<TAB>
@@ -143,14 +145,14 @@ outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.sessionVariab
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.sessionVariables.DELTA_PAGER
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.sessionVariables.EDITOR
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.sessionVariables.TERM
-# ......omit other outputs
+# ......omitindo algumas saídas (outputs)
 
-# check the value of `TERM`
+# verificar o valor de TERM
 nix-repl> outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.sessionVariables.TERM
 "xterm-256color"
 
 
-# check all files defined by `home.file`
+# verificar todos os arquivos definidos por `home.file`
 nix-repl> outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.file.<TAB>
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.file..bash_profile
 outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.file..bashrc
@@ -161,19 +163,19 @@ outputs.nixosConfigurations.ai.config.home-manager.users.ryan.home.file..config/
 #......
 ```
 
-As you can see, after loading your Nix flake into the REPL, you can check every attribute
-of the flake. This capability is very convenient for debugging purposes.
+Como você pode ver, depois de carregar seu Nix flake no REPL, você pode verificar cada
+atributo do flake. Essa capacidade é muito conveniente para fins de depuração.
 
-## Debugging functions provided by nixpkgs
-
-TODO
-
-## Debugging by using `NIX_DEBUG` in derivation
+## Funções de depuração fornecidas por nixpkgs
 
 TODO
 
-## References
+## Depuração usando `NIX_DEBUG` em derivação
+
+TODO
+
+## Referências
 
 - [How to make nix build display all commands executed by make?](https://www.reddit.com/r/NixOS/comments/14stdgy/how_to_make_nix_build_display_all_commands/)
-  - use `NIX_DEBUG=7` in derivation
+  - use `NIX_DEBUG=7` em derivação
 - [Collection of functions useful for debugging broken nix expressions.](https://github.com/NixOS/nixpkgs/blob/nixos-23.05/lib/debug.nix)

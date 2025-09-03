@@ -1,63 +1,63 @@
-# Custom NIX_PATH and Flake Registry
+# NIX_PATH Personalizado e Registro de Flake
 
-## Introduction to NIX_PATH {#nix-path-introduction}
+## Introdução ao NIX_PATH {#nix-path-introduction}
 
-The Nix search path is controlled by the environment variable `NIX_PATH`, which follows
-the same format as the Linux `PATH` environment variable, consisting of multiple paths
-separated by colons.
+O caminho de busca do **Nix** é controlado pela variável de ambiente `NIX_PATH`, que segue
+o mesmo formato da variável de ambiente `PATH` do Linux, consistindo de múltiplos caminhos
+separados por dois-pontos.
 
-Paths in Nix expressions that look like `<name>` are resolved using the path named `name`
-from the `NIX_PATH`.
+Caminhos em expressões do Nix que se parecem com `<name>` são resolvidos para o caminho
+com o nome `name` definido no `NIX_PATH`.
 
-This usage pattern is no longer recommended under the Flakes feature because it results in
-Flake builds depending on a mutable environment variable `NIX_PATH`, compromising
-reproducibility.
+Este padrão de uso não é mais recomendado com o recurso Flakes, porque resulta em
+construções que dependem de uma variável de ambiente mutável, a `NIX_PATH`, o que
+compromete a reprodutibilidade.
 
-However, in certain scenarios, we still need to use `NIX_PATH`, such as when we frequently
-use the command `nix repl '<nixpkgs>'`, which utilizes the Nixpkgs found through
-`NIX_PATH` search.
+No entanto, em certos cenários, ainda precisamos usar o `NIX_PATH`, scomo quando usamos
+frequentemente o comando `nix repl '<nixpkgs>'`, que utiliza o Nixpkgs encontrado através
+da busca pelo `NIX_PATH`.
 
-## Introduction to Flakes Registry {#flakes-registry-introduction}
+## Introdução ao Registro de Flakes {#flakes-registry-introduction}
 
-The Flakes Registry is a center for Flake registration that assists us in using shorter
-IDs instead of lengthy flake repository addresses when using commands like `nix run`,
-`nix shell`, and more.
+O Registro de Flakes é um centro para registro de Flakes que nos ajuda a usar IDs mais
+curtos em vez de endereços longos de repositório de flake ao usar comandos como `nix run`,
+`nix shell`, e outros.
 
-By default, Nix looks up the corresponding GitHub repository address for this ID from
-<https://github.com/NixOS/flake-registry/blob/master/flake-registry.json>.
+Por padrão, o Nix procura o endereço do repositório correspondente no GitHub para este ID
+a partir de <https://github.com/NixOS/flake-registry/blob/master/flake-registry.json>.
 
-For instance, if we execute `nix run nixpkgs#ponysay hello`, Nix will automatically
-retrieve the GitHub repository address for `nixpkgs` from the aforementioned JSON file. It
-then downloads the repository, locates the `flake.nix` within, and runs the corresponding
-`ponysay` package.
+Por exemplo, se executarmos `nix run nixpkgs#ponysay hello`, o Nix irá automaticamente
+recuperar o endereço do repositório do GitHub para `nixpkgs` a partir do arquivo JSON
+mencionado. Ele então baixa o repositório, localiza o `flake.nix` dentro, e executa o
+pacote `ponysay` correspondente.
 
-## Custom NIX_PATH and Flake Registry {#custom-nix-path-and-flake-registry-1}
+## NIX_PATH Personalizado e Registro de Flake {#custom-nix-path-and-flake-registry-1}
 
-> **NOTE: Newcomers should skip this section! Disabling `nix-channel` incorrectly may lead
-> to some headaches.**
+> **NOTA: Iniciantes devem pular esta seção! Desabilitar o `nix-channel` de forma
+> incorreta pode causar algumas dores de cabeça.**
 
-The roles of `NIX_PATH` and the Flake Registry have been explained earlier. In daily use,
-we typically want the `nixpkgs` used in commands like `nix repl '<nixpkgs>'`,
-`nix run nixpkgs#ponysay hello` to match the system's `nixpkgs`. This is done by default
-as of [NixOS 24.05][automatic flake registry]. Also, although `nix-channel` can coexist
-with the Flakes feature, in practice, Flakes can completely replace it, so we can also
-disable it.
+Os papéis do `NIX_PATH` e do Registro de Flakes foram explicados anteriormente. No uso
+diário, nós geralmente queremos que o `nixpkgs` usado em comandos como
+`nix repl '<nixpkgs>'` e `nix run nixpkgs#ponysay hello` corresponda ao `nixpkgs`. do
+sistema. Isso é feito por padrão a partir do [NixOS 24.05][automatic flake registry]. Além
+disso, embora o `nix-channel` possa coexistir com o recurso Flakes, na prática, os Flakes
+podem substituí-lo completamente, então podemos também desabilitá-lo.
 
 [automatic flake registry]: https://github.com/NixOS/nixpkgs/pull/254405
 
-In your NixOS configuration, adding the following module will achieve the mentioned
-requirements:
+Na sua configuração do NixOS, adicionar o seguinte módulo irá cumprir os requisitos
+mencionados:
 
 ```nix
 { nixpkgs, ... }: {
-  nix.channel.enable = false; # remove nix-channel related tools & configs, we use flakes instead.
+  nix.channel.enable = false; # Remover ferramentas e configurações relacionadas ao nix-channel, pois usamos flakes no lugar.
 
-  # this is set automatically by nixpkgs.lib.nixosSystem but might be required
-  # if one is not using that:
+  # isso é definido automaticamente por nixpkgs.lib.nixosSystem
+  # mas pode ser necessário caso não se esteja usando isso:
   # nixpkgs.flake.source = nixpkgs;
 }
 ```
 
-## References
+## Referências
 
 - [Chapter 15. Nix Search Paths - Nix Pills](https://nixos.org/guides/nix-pills/nix-search-paths.html)

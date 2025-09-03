@@ -1,62 +1,67 @@
-# Remote Deployment
+# Implantação Remota
 
-Nix's inherent design is well-suited for remote deployment, and the Nix community offers
-several tools tailored for this purpose, such as [NixOps](https://github.com/NixOS/nixops)
-and [colmena](https://github.com/zhaofengli/colmena). Additionally, the official tool
-we've used extensively, `nixos-rebuild`, possesses some remote deployment capabilities
-too.
+O design inerente do Nix é bem adequado para o deployment remoto, e a comunidade Nix
+oferece diversas ferramentas sob medida para essa finalidade, como o
+[NixOps](https://github.com/NixOS/nixops) e o
+[colmena](https://github.com/zhaofengli/colmena). Além disso, a ferramenta oficial que
+usamos extensivamente, o `nixos-rebuild`, também possui algumas capacidades de deployment
+remoto.
 
-In addition, within multi-architecture scenarios, remote deployment can optimally leverage
-Nix's multi-architecture support. For example, you can cross-compile an aarch64/riscv64
-NixOS system on an x86_64 host, followed by remote deployment onto the corresponding hosts
-via SSH.
+Ademais, em cenários de multiarquitetura, o deployment remoto pode aproveitar de forma
+ideal o suporte multiarquitetura do Nix. Por exemplo, você pode fazer uma compilação
+cruzada de um sistema NixOS aarch64/riscv64 em um host x86_64, seguida de um deployment
+remoto para os hosts correspondentes via SSH.
 
-Recently, I encountered a situation where I cross-compiled a NixOS system image for a
-RISCV64 SBC on my local machine. Consequently, I already possessed all the compilation
-caches for building this system locally. However, due to the lack of official binary
-caches for RISCV64 architecture, executing any uninstalled program directly on the
-development board (e.g., `nix run nixpkgs#cowsay hello`) triggered extensive compilations.
-This process consumed hours, which was quite unacceptable.
+Recentemente, me deparei com uma situação em que fiz a compilação cruzada de uma imagem de
+sistema **NixOS** para uma **SBC** **RISCV64** na minha máquina local. Consequentemente,
+eu já possuía todos os caches de compilação para construir este sistema localmente. No
+entanto, devido à falta de caches binários oficiais para a arquitetura **RISCV64**, a
+execução de qualquer programa não instalado diretamente na placa de desenvolvimento (por
+exemplo, `nix run nixpkgs#cowsay hello`) desencadeava compilações extensivas. Esse
+processo consumia horas, o que era bastante inaceitável.
 
-By adopting remote deployment, I could fully harness the computational power of my local
-high-performance CPU and the extensive compilation caches. This switch vastly improved my
-experience and significantly mitigated the previously time-consuming compilation issue.
+Ao adotar o deployment remoto, pude aproveitar totalmente o poder computacional da minha
+CPU local de alta performance e os extensos caches de compilação. Essa mudança melhorou
+vastamente minha experiência e mitigou significativamente o problema de compilação que
+antes consumia muito tempo.
 
-Let me briefly guide you through using `colmena` or `nixos-rebuild` for remote deployment.
+Permita-me guiá-lo brevemente através do uso do `colmena` ou `nixos-rebuild` para
+deployment remoto.
 
-## Prerequisites
+## Pré-requisitos
 
-Before embarking on remote deployment, a few preparatory steps are necessary:
+Antes de embarcar no deployment remoto, alguns passos preparatórios são necessários:
 
-1. To prevent remote host's sudo password verification failure, choose one of the
-   following methods:
-   1. Deploy as the remote host's `root` user.
-   2. Add `security.sudo.wheelNeedsPassword = false;` to the remote host's configuration
-      and manually deploy once in advance to grant the user passwordless sudo
-      permissions..
-      1. **This will allow user-level programs to silently obtain sudo permissions, posing
-         a security risk**! Therefore, if you choose this method, it's advisable to create
-         a dedicated user for remote deployment, rather than using your regular user
-         account!
-2. Configure SSH public key authentication for the remote hosts.
-   1. Use the `users.users.<name>.openssh.authorizedKeys.keys` option to complete this
-      task.
-3. Add the remote host's Known Hosts record to your local machine. Otherwise,
-   colmena/nixos-rebuild will fail to deploy due to the inability to verify the remote
-   host's identity.
-   1. Use the `programs.ssh.knownHosts` option to add the remote host's public key to the
-      Known Hosts record.
-4. Manually use the `ssh root@<you-host>` command to verify that you can login to the
-   remote host.
-   1. If you encounter any issues, resolve them before proceeding.
+1. Para evitar falha na verificação de senha sudo do host remoto, escolha um dos seguintes
+   métodos:
+   1. Faça o deployment como o usuário `root` do host remoto.
+   2. Adicione `security.sudo.wheelNeedsPassword = false;` à configuração do host remoto e
+      faça um deployment manual uma vez para conceder ao usuário permissões sudo sem
+      senha.
+      1. **Isso permitirá que programas de nível de usuário obtenham permissões sudo
+         silenciosamente, o que representa um risco de segurança**! Portanto, se você
+         escolher este método, é aconselhável criar um usuário dedicado para deployment
+         remoto, em vez de usar sua conta de usuário regular!
+2. Configure a autenticação de chave pública SSH para os hosts remotos.
+   1. Use a opção `users.users.<name>.openssh.authorizedKeys.keys` para completar esta
+      tarefa.
+3. Adicione o registro do Known Hosts do host remoto à sua máquina local. Caso contrário,
+   o colmena/nixos-rebuild falhará em fazer o deployment devido à incapacidade de
+   verificar a identidade do host remoto.
+   1. Use a opção `programs.ssh.knownHosts` para adicionar a chave pública do host remoto
+      ao registro do Known Hosts.
+4. Use o comando `ssh root@<you-host>` manualmente para verificar se você pode fazer login
+   no host remoto.
+   1. Se você encontrar algum problema, resolva-o antes de continuar.
 
-It's advisable to use the `root` user for deployment as it's more convenient and avoids
-the complexities of sudo permissions.
+É aconselhável usar o usuário `root` para o deployment, pois é mais conveniente e evita as
+complexidades das permissões sudo.
 
-Assuming we intend to deploy remotely using the root user, the initial step involves
-configuring SSH public key authentication for the root user on the remote host. To
-accomplish this, simply add the following content to any NixOS Module in the remote host's
-Nix configuration (e.g., `configuration.nix`), then rebuild the system:
+Supondo que pretendemos fazer o deployment remotamente usando o usuário root, o passo
+inicial envolve configurar a autenticação de chave pública SSH para o usuário root no host
+remoto. Para realizar isso, basta adicionar o seguinte conteúdo a qualquer Módulo NixOS na
+configuração Nix do host remoto (por exemplo, `configuration.nix`), e então reconstruir o
+sistema:
 
 ```nix{6-9}
 # configuration.nix
@@ -65,7 +70,7 @@ Nix configuration (e.g., `configuration.nix`), then rebuild the system:
   # ...
 
   users.users.root.openssh.authorizedKeys.keys = [
-    # TODO Replace with your own SSH public key.
+    # TODO Substitua pela sua própria chave pública SSH.
     "ssh-ed25519 AAAAC3Nxxxxx ryan@xxx"
   ];
 
@@ -73,21 +78,21 @@ Nix configuration (e.g., `configuration.nix`), then rebuild the system:
 }
 ```
 
-Furthermore, you'll need to add the SSH private key to the SSH agent on your local machine
-for authentication during remote deployment:
+Além disso, você precisará adicionar a chave privada SSH ao agente SSH na sua máquina
+local para autenticação durante o deployment remoto:
 
 ```bash
 ssh-add ~/.ssh/your-private-key
 ```
 
-## Deploy through `colmena`
+## Fazer o deployment com `colmena`
 
-`colmena` doesn't directly use the familiar `nixosConfigurations.xxx` for remote
-deployment. Instead, it customizes a flake outputs named `colmena`. Although its structure
-is similar to `nixosConfigurations.xxx`, it's not identical.
+O `colmena` não usa diretamente o familiar `nixosConfigurations.xxx` para deployment
+remoto. Em vez disso, ele personaliza uma saída (outputs) de flake chamada `colmena`.
+Embora a estrutura seja similar à de `nixosConfigurations.xxx`, não é idêntica.
 
-In your system's `flake.nix`, add a new outputs named `colmena`. A simple example is shown
-below:
+No `flake.nix` do seu sistema, adicione uma nova saída (outputs) chamada `colmena`. Um
+exemplo simples é mostrado abaixo:
 
 ```nix{11-34}
 {
@@ -99,26 +104,26 @@ below:
   outputs = { self, nixpkgs }: {
     # ...
 
-    # Add this output, colmena will read its contents for remote deployment
+    # Adicione esta saída (outputs), e o colmena lerá seu conteúdo para deployment remoto.
     colmena = {
       meta = {
         nixpkgs = import nixpkgs { system = "x86_64-linux"; };
 
-        # This parameter functions similarly to `specialArgs` in `nixosConfigurations.xxx`,
-        # used for passing custom arguments to all submodules.
+        # Este parâmetro funciona de forma similar a `specialArgs` em `nixosConfigurations.xxx`,
+        # e é usado para passar argumentos personalizados a todos os submódulos.
         specialArgs = {
           inherit nixpkgs;
         };
       };
 
-      # Host name = "my-nixos"
+      # Nome do host = "my-nixos"
       "my-nixos" = { name, nodes, ... }: {
-        # Parameters related to remote deployment
-        deployment.targetHost = "192.168.5.42"; # Remote host's IP address
-        deployment.targetUser = "root";  # Remote host's username
+        # Parâmetros relacionados ao deployment remoto
+        deployment.targetHost = "192.168.5.42"; # Endereço IP do host remoto
+        deployment.targetUser = "root";  # Nome de usuário do host remoto
 
-        # This parameter functions similarly to `modules` in `nixosConfigurations.xxx`,
-        # used for importing all submodules.
+        # Este parâmetro funciona de forma similar a modules em `nixosConfigurations.xxx`,
+        # e é usado para importar todos os submódulos.
         imports = [
           ./configuration.nix
         ];
@@ -128,40 +133,40 @@ below:
 }
 ```
 
-Now you can deploy your configuration to the device:
+Agora você pode fazer o _deployment_ da sua configuração para o dispositivo:
 
 ```bash
 nix run nixpkgs#colmena apply
 ```
 
-For more advanced usage, refer to colmena's official documentation at
+Para uso mais avançado, consulte a documentação oficial do colmena em
 <https://colmena.cli.rs/unstable/introduction.html>
 
-## Deploy through `nixos-rebuild`
+## Fazer o deployment com `nixos-rebuild`
 
-Using `nixos-rebuild` for remote deployment has the advantage of being similar to
-deploying to a local host. It only requires a few additional parameters to specify the
-remote host's IP address, username, and other details.
+Usar o `nixos-rebuild` para deployment remoto tem a vantagem de ser similar a fazer o
+deployment para um host local. Isso requer apenas alguns parâmetros adicionais para
+especificar o endereço IP, o nome de usuário e outros detalhes do host remoto.
 
-For instance, to deploy the configuration defined in the `nixosConfigurations.my-nixos` of
-your flake to a remote host, use the following command:
+Por exemplo, para fazer o deployment da configuração definida em
+`nixosConfigurations.my-nixos` do seu flake para um host remoto, use o seguinte comando:
 
 ```bash
 nixos-rebuild switch --flake .#my-nixos \
   --target-host root@192.168.4.1 --build-host localhost --verbose
 ```
 
-The above command will build and deploy the configuration of `my-nixos` to a server with
-IP `192.168.4.1`. The system build process will occur locally.
+O comando acima irá construir e fazer o deployment da configuração de `my-nixos` para um
+servidor com o IP `192.168.4.1`. O processo de construção do sistema ocorrerá localmente.
 
-If you prefer to build the configuration on the remote host, replace
-`--build-host localhost` with `--build-host root@192.168.4.1`.
+Se você preferir construir a configuração no host remoto, substitua
+`--build-host localhost` por `--build-host root@192.168.4.1`.
 
-To avoid repeatedly using IP addresses, you can define host aliases in your local
-machine's `~/.ssh/config` or `/etc/ssh/ssh_config`. For example:
+Para evitar o uso repetido de endereços IP, você pode definir aliases de host no
+`~/.ssh/config` ou `/etc/ssh/ssh_config` da sua máquina local. Por exemplo:
 
-> Generating the SSH configuration entirely through Nix configuration is possible, and
-> this task is left to you.
+> Gerar a configuração SSH inteiramente através da configuração Nix é possível, e essa
+> tarefa fica a seu cargo.
 
 ```bash
 › cat ~/.ssh/config
@@ -175,10 +180,11 @@ Host aquamarine
 # ......
 ```
 
-With this setup, you can use host aliases for deployment:
+Com essa configuração, você pode usar aliases de host para o deployment:
 
 ```bash
 nixos-rebuild switch --flake .#my-nixos --target-host root@aquamarine --build-host root@aquamarine --verbose
 ```
 
-This offers a more convenient way to deploy using the defined host aliases.
+Isso oferece uma maneira mais conveniente de fazer o deployment usando os aliases de host
+definidos.

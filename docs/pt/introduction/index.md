@@ -10,7 +10,7 @@ responsabiliza por atingir esse estado.
 > declarar o resultado desejado. Por exemplo, se você declarar que quer substituir o
 > gerenciador de janelas i3 por sway, o Nix irá te ajudar a atingir esse objetivo. Você
 > não precisa se preocupar com os detalhes subjacentes, como quais pacotes o sway exige
-> para a instalação, > quais pacotes relacionados ao i3 precisam ser desinstalados, ou os
+> para a instalação, quais pacotes relacionados ao i3 precisam ser desinstalados, ou os
 > ajustes necessários na configuração do sistema e nas variáveis de ambiente para o sway.
 > O Nix lida automaticamente com esses detalhes para o usuário (desde que os pacotes Nix
 > relacionados a sway e i3 sejam projetados corretamente).
