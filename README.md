@@ -23,76 +23,62 @@ Versão em Português: https://iedame.github.io/nixos-and-flakes-book-pt/
 
 ---
 
-> If you're using macOS,
+> Se você estiver usando macOS,
 > [ryan4yin/nix-darwin-kickstarter](https://github.com/ryan4yin/nix-darwin-kickstarter)
-> may be a good starting point for you, you can learn how to use Nix with this book and
-> take nix-darwin-kickstarter as a start point to build your own Nix configuration.
+> pode ser um bom ponto de partida. Você pode aprender a usar o Nix com este livro e
+> usar o nix-darwin-kickstarter como ponto de partida para construir sua própria configuração Nix.
 
-## Feedback and Discussion
+## Feedback e Discussão
 
-I’m not an expert on NixOS, and I’ve only been using NixOS for less than 9 months until
-now(2024-02), so there must be some misconceptions or inappropriate examples in the book.
-If anyone finds anything incorrect or have any questions / suggestions, just let me know
-about it by open an issue or join the discussion on
-[GitHub Discussions](https://github.com/ryan4yin/nixos-and-flakes-book/discussions), I'm
-glad continue to optimize the content of this book.
+Não sou um especialista em NixOS e o utilizo há menos de 9 meses até agora (fevereiro de 2024), então deve haver alguns equívocos ou exemplos inadequados no livro. Se alguém encontrar algo incorreto ou tiver quaisquer perguntas/sugestões, por favor, me informe, abrindo uma issue ou participando da discussão em
+[GitHub Discussions](https://github.com/ryan4yin/nixos-and-flakes-book/discussions). Terei o maior prazer em continuar a otimizar o conteúdo deste livro.
 
-The reason why I wrote this little book was only because no one in the community did it
-for me, who was a beginner at the time, so I chose to do it myself. Even though I knew I
-could make mistakes, it's much better than do nothing.
+A razão pela qual eu escrevi este pequeno livro foi apenas porque ninguém na comunidade o fez por mim, que era um iniciante na época, então eu escolhi fazê-lo eu mesmo. Embora eu soubesse que poderia cometer erros, é muito melhor do que não fazer nada.
 
-My hope is that this book can help more people, enabling them to experience the joys of
-NixOS. Hope you like it!
+Minha esperança é que este livro possa ajudar mais pessoas, permitindo que elas experimentem as alegrias do NixOS. Espero que gostem!
 
-## Introduction to Flakes
+## Introdução aos Flakes
 
-The flakes experimental feature is a major development for Nix, it introduces a policy for
-managing dependencies between Nix expressions, it improves reproducibility, composability
-and usability in the Nix ecosystem. Although it's still an experimental feature, flakes
-have been widely used by the Nix community.[^1]
+A funcionalidade experimental flakes é um desenvolvimento importante para o Nix. Ela introduz uma política para gerenciar dependências entre expressões Nix, melhora a reprodutibilidade, a componibilidade e a usabilidade no ecossistema Nix. Embora ainda seja um recurso experimental, os flakes são amplamente utilizados pela comunidade Nix.[^1]
 
-Flakes is one of the most significant changes the nix project has ever seen.[^2]
+Flakes é uma das mudanças mais significativas que o projeto Nix já viu.[^2]
 
-## A Word of Caution about Flakes
+## Uma Palavra de Cautela sobre os Flakes
 
-The benefits of Flakes are evident, and the entire NixOS community has embraced it
-wholeheartedly. Currently, more than half of the users utilize Flakes[^3], providing
-assurance that Flakes will not be deprecated.
+Os benefícios dos Flakes são evidentes, e toda a comunidade NixOS o adotou de todo o coração. Atualmente, mais da metade dos usuários utiliza Flakes[^3], o que nos dá a garantia de que o Flakes não será descontinuado.
 
-:warning: However, it's important to note that **Flakes is still an experimental
-feature**. Some issues persist, and there is a possibility of introducing breaking changes
-during the stabilization process. The extent of these breaking changes remains uncertain.
+:warning: No entanto, é importante notar que o **Flakes ainda é uma funcionalidade experimental**. Alguns problemas persistem e há a possibilidade de introduzir breaking changes durante o processo de estabilização. A extensão dessas breaking changes permanece incerta.
 
-Overall, I strongly recommend everyone to use Flakes, especially since this book revolves
-around NixOS and Flakes. However, it's crucial to be prepared for potential problems that
-may arise due to forthcoming breaking changes.
+No geral, eu recomendo fortemente que todos usem o Flakes, especialmente porque este livro gira em torno do NixOS e do Flakes. Contudo, é crucial estar preparado para possíveis problemas que podem surgir devido às futuras *breaking changes*.
 
-## Contribution
+## Contribuição
 
-> _A real community, however, exists only when its members interact in a meaningful way
-> that deepens their understanding of each other and leads to learning._
+> _No entanto, uma comunidade real só existe quando seus membros interagem de forma
+> significativa, aprofundando a compreensão mútua e levando ao aprendizado._
 
 If you find something which doesn't make sense, or something doesn't seem right, please
 make a pull request and please add valid and well-reasoned explanations about your changes
 or comments.
 
-Before adding a pull request, please see the
-[contributing guidelines](/.github/CONTRIBUTING.md).
+Se você encontrar algo que não faça sentido, ou que pareça incorreto, por favor, envie um pull request e adicione explicações válidas e bem fundamentadas sobre suas alterações ou comentários.
 
-Thank you to
-[all the people](https://github.com/ryan4yin/nixos-and-flakes-book/graphs/contributors)
-who already contributed to this project!
+Antes de enviar um pull request, por favor, consulte as
+[diretrizes de contribuição](/.github/CONTRIBUTING.md).
 
-## References
+Obrigado a
+[todas as pessoas](https://github.com/ryan4yin/nixos-and-flakes-book/graphs/contributors)
+que já contribuíram para este projeto!
 
-- The cover is based on the image from anime
+## Referências
+
+- A capa é baseada na imagem do anime
   "[The Rolling Girls](https://en.wikipedia.org/wiki/The_Rolling_Girls)"
-- The NixOS logo is from [NixOS](https://nixos.org/)
+- O logotipo do NixOS é de [NixOS](https://nixos.org/)
 
-## License
+## Licença
 
 [NixOS & Flakes Book](https://github.com/ryan4yin/nixos-and-flakes-book) © 2023 by Ryan
-Yin is licensed under [CC BY-SA 4.0](./LICENSE.md)
+Yin é licenciado sob [CC BY-SA 4.0](./LICENSE.md)
 
 [^1]: [Flakes - NixOS Wiki](https://wiki.nixos.org/wiki/Flakes)
 
