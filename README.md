@@ -9,13 +9,13 @@ iniciantes? Então você veio ao lugar certo!
 
 ---
 
-Versões Mantidas pelo Autor Original: 
+Versões Mantidas pelo Autor: 
 
 English Version: https://nixos-and-flakes.thiscute.world/ 
 
 中文版: https://nixos-and-flakes.thiscute.world/zh/
 
-Versões Não Oficiais:
+Versões Mantidas pela Comunidade:
 
 Versão em Português: https://iedame.github.io/nixos-and-flakes-book-pt/
 
