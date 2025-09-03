@@ -13,8 +13,8 @@ de sistema consistentes em várias máquinas.
 Embora o NixOS seja poderoso, sua força também vem com uma complexidade de sistema maior.
 Isso o torna mais desafiador para os recém-chegados. Um grande desafio é que o
 conhecimento acumulado em outras distribuições Linux não é facilmente transferível para o
-NixOS. Outro é que a documentação official e da comunidade é muitas vezes dispensary e
-desatualizada. Esses problems têm incomodado muitos iniciantes em NixOS.
+NixOS. Outro é que a documentação oficial e da comunidade é muitas vezes dispensável e
+desatualizada. Esses problemas têm incomodado muitos iniciantes em NixOS.
 
 Podemos observar essas questões com o recurso experimental do gerenciador de pacotes Nix
 chamado Flakes. Inspirado por gerenciadores de pacotes como npm e Cargo, os Flakes usam o
@@ -26,7 +26,7 @@ As vantagens dos Flakes os tornaram amplamente populares na comunidade: de acord
 pesquisas oficiais, mais da metade dos novos repositórios Nix criados no GitHub agora
 utilizam Flakes.
 
-No entanto, para manter a estabilidade, a documentação official quase não cobre conteúdo
+No entanto, para manter a estabilidade, a documentação oficial quase não cobre conteúdo
 relacionado a Flakes. Isso deixou muitos usuários de Nix/NixOS confusos. Eles veem todos
 usando Flakes e também querem aprender, mas não encontram por onde começar, muitas vezes
 tendo que juntar informações dispersas, procurar no código-fonte do Nixpkgs, ou pedir
@@ -38,14 +38,14 @@ Este livro teve origem em minhas notas dispersas de quando comecei a usar o NixO
 
 Em abril deste ano (2023), ao me aprofundar no NixOS, me apaixonei por sua filosofia de
 design. Por recomendação de um amigo, conheci o recurso experimental Flakes do Nix. Após
-comparar os Flakes com o método de configuração traditional do NixOS, percebi que apenas
+comparar os Flakes com o método de configuração tradicional do NixOS, percebi que apenas
 um NixOS com o recurso Flakes habilitado atendia às minhas expectativas. Consequentemente,
-ignorei completamente a abordagem de configuração traditional do Nix e, em meus primeiros
+ignorei completamente a abordagem de configuração tradicional do Nix e, em meus primeiros
 passos, aprendi diretamente a configurar meu sistema NixOS usando Flakes.
 
 Ao longo do meu processo de aprendizado, descobri que havia pouquíssimos recursos sobre
 Flakes para iniciantes. A vasta maioria da documentação focava na abordagem de
-configuração traditional do Nix, me forçando a extrair as informações de que precisava de
+configuração tradicional do Nix, me forçando a extrair as informações de que precisava de
 várias fontes, como o NixOS Wiki, Zero to Nix, Nixpkgs Manual e o código-fonte do Nixpkgs,
 desconsiderando qualquer conteúdo não relacionado a Flakes. Essa jornada de aprendizado
 foi bastante confusa e dolorosa. Para evitar futuros tropeços, documentei diligentemente
@@ -60,7 +60,7 @@ compartilhei no Reddit, recebendo um forte feedback[^2].
 A recepção positiva desse documento compartilhado me encorajou e me motivou a continuar
 aprimorando-o. Com atualizações contínuas, o conteúdo deste documento se expandiu para
 mais de 20.000 palavras. Alguns leitores sugeriram que a experiência de leitura poderia
-set melhorada, o que me levou a atender às suas sugestões[^3]. Como resultado, migrei o
+ser melhorada, o que me levou a atender às suas sugestões[^3]. Como resultado, migrei o
 conteúdo do artigo para um repositório no GitHub, criei um site de documentação dedicado e
 ajustei a apresentação para que se alinhasse mais com um guia para iniciantes, em vez de
 um caderno de anotações pessoal.
@@ -84,7 +84,7 @@ atual.
 
 ## Os Recursos deste Livro
 
-1. Focado em NixOS e Flakes, desconsiderando a abordagem de configuração traditional do
+1. Focado em NixOS e Flakes, desconsiderando a abordagem de configuração tradicional do
    Nix.
 2. Para iniciantes, com explicações da perspectiva de novatos em NixOS que já possuem
    alguma experiência com o uso de Linux e programação.
@@ -117,7 +117,7 @@ feliz em continuar a aprimorar o conteúdo deste livro.
 
 A razão pela qual escrevi este pequeno livro foi simplesmente porque ninguém na comunidade
 o fez por mim, que era um iniciante na época, então decidi fazer eu mesmo. Mesmo sabendo
-que poderia cometer errors, é muito melhor do que não fazer nada.
+que poderia cometer erros, é muito melhor do que não fazer nada.
 
 Minha esperança é que este livro possa ajudar mais pessoas, permitindo que elas
 experimentem as alegrias do NixOS. Espero que gostem!
