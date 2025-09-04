@@ -104,7 +104,7 @@ for (const category of sidebar) {
   if (category.items) {
     for (const item of category.items) {
       if (item.link && item.link.endsWith(".md")) {
-        const filePath = path.join("en", item.link).replace(/\\/g, "/")
+        const filePath = path.join("pt", item.link).replace(/\\/g, "/")
         fileList.push(filePath)
       }
     }
@@ -159,7 +159,7 @@ const pandocCommand = `pandoc ${fileList.join(" ")} \
   --css=epub-fixes.css \
   --metadata=title:"NixOS and Flakes Book" \
   --metadata=author:"Ryan Yin" \
-  --resource-path=.:../docs/public:en`
+  --resource-path=.:../docs/public:pt`
 
 console.log("🚀 Executing pandoc:", pandocCommand)
 
