@@ -116,7 +116,7 @@ pode substituí-los pelos comandos correspondentes da Nova CLI (exceto para
    desenvolvimento e testes.
    1. Nova CLI: Esta ferramenta é dividida em três subcomandos: `nix develop`,
       `nix shell`, e `nix run`. Discutiremos esses três comandos em detalhes no capítulo
-      "[Desenvolvimento](../development/intro.md)" chapter.
+      "[Desenvolvimento](../development/intro.md).
 4. `nix-build`:O `nix-build` constrói pacotes Nix e coloca os resultados da build em
    `/nix/store`, mas não os registra na configuração declarativa do Nix.
    1. Nova CLI: O `nix-build` é substituído pelo `nix build`.
