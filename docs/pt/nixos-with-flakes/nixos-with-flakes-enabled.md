@@ -55,7 +55,7 @@ toda a sintaxe Nix que aprendeu anteriormente.
 ## Alternando a Configuração do Sistema para flake.nix {#switch-to-flake-nix}
 
 Após habilitar a funcionalidade Flakes, o comando `sudo nixos-rebuild switch` dará
-prioridade à leitura do arquivo `/etc/nixos/flake.nix` file, e, se não o encontrar,
+prioridade à leitura do arquivo `/etc/nixos/flake.nix`, e, se não o encontrar,
 tentará usar o `/etc/nixos/configuration.nix`.
 
 Você pode começar usando os modelos oficiais para aprender a escrever um flake. Primeiro,
