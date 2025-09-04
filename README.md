@@ -7,21 +7,15 @@ iniciantes? Então você veio ao lugar certo!
 
 :book: Um livro NixOS & Flakes não oficial e com opiniões para iniciantes: https://nixos-and-flakes.ieda.me/
 
----
+### Versões Mantidas pelo Autor: 
 
-Versões Mantidas pelo Autor: 
+* **English Version**: https://nixos-and-flakes.thiscute.world/
+* **中文版**: https://nixos-and-flakes.thiscute.world/zh/
 
-English Version: https://nixos-and-flakes.thiscute.world/ 
+### Versões Mantidas pela Comunidade:
 
-中文版: https://nixos-and-flakes.thiscute.world/zh/
-
-Versões Mantidas pela Comunidade:
-
-Versão em Português: https://nixos-and-flakes.ieda.me/
-
-日本語版: https://nixos-and-flakes-ja.hayao0819.com/
-
----
+* **Versão em Português**: https://nixos-and-flakes.ieda.me/
+* **日本語版**: https://nixos-and-flakes-ja.hayao0819.com/
 
 > Se você estiver usando macOS,
 > [ryan4yin/nix-darwin-kickstarter](https://github.com/ryan4yin/nix-darwin-kickstarter)
@@ -77,7 +71,7 @@ que já contribuíram para este projeto!
 
 ## Licença
 
-[NixOS & Flakes Book](https://github.com/ryan4yin/nixos-and-flakes-book) © 2023 by Ryan
+[NixOS & Flakes Book](https://github.com/ryan4yin/nixos-and-flakes-book) © 2023 por Ryan
 Yin é licenciado sob [CC BY-SA 4.0](./LICENSE.md)
 
 [^1]: [Flakes - NixOS Wiki](https://wiki.nixos.org/wiki/Flakes)
