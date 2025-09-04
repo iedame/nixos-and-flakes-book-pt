@@ -3,7 +3,8 @@ import { shared } from "./shared"
 import { pt } from "./pt"
 
 export default defineConfig({
-  base: "/nixos-and-flakes-book-pt/",
+  // Enable this if using GitHub Pages without custom domain
+  //base: "/nixos-and-flakes-book-pt/",
 
   ...shared,
   title: "NixOS & Flakes Book",
