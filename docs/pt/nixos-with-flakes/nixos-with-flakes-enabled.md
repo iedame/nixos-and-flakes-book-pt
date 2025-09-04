@@ -124,7 +124,7 @@ Atualmente, nosso flake inclui estes arquivos:
 - `/etc/nixos/configuration.nix`: Este é o nosso arquivo de configuração anterior, que é
   importado como um módulo em `flake.nix`. Atualmente, todas as configurações do sistema
   são escritas neste arquivo.
-- `/etc/nixos/hardware-configuration.nix`: ste é o arquivo de configuração de hardware do
+- `/etc/nixos/hardware-configuration.nix`: Este é o arquivo de configuração de hardware do
   sistema, gerado pelo NixOS, que descreve as informações de hardware do sistema.
 
 ## Conclusão
