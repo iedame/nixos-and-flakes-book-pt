@@ -26,7 +26,7 @@ const footerTemplate = `<div style="margin-bottom: -0.4cm; height: 70%; width: 1
 </div>`
 
 export default defineUserConfig({
-  urlOrigin: "https://nixos-and-flakes.thiscute.world/",
+  urlOrigin: "https://nixos-and-flakes.ieda.me/",
 
   // When NO_SANDBOX is true, disable sandboxing
   ...(process.env.NO_SANDBOX === "true"
@@ -50,13 +50,13 @@ export default defineUserConfig({
     },
   },
 
-  routePatterns: ["!/zh/**"], // exclude zh-CN pages
+  routePatterns: ["!/zh/**", "!/en/**"], // exclude zh-CN pages
   sorter: (pageA, pageB) => {
     // console.log("pageA: ", pageA.path, "  pageB: ", pageB.path)
 
     // remove the locale prefix
-    const pathA = pageA.path.replace("/en/", "/")
-    const pathB = pageB.path.replace("/en/", "/")
+    const pathA = pageA.path.replace("/pt/", "/")
+    const pathB = pageB.path.replace("/pt/", "/")
     // compare
     const aIndex = routeOrder.findIndex((route) => route === pathA)
     const bIndex = routeOrder.findIndex((route) => route === pathB)
