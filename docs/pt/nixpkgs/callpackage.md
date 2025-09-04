@@ -125,7 +125,7 @@ funciona:
 
 Como pode ser um arquivo ou função Nix, usado como argumento para `pkgs.callPackage`? Você
 pode examinar exemplos que usamos antes em
-[Uso Avançado do Nixpkgs - Introdução:](./intro.md): `hello.nix`, `fcitx5-rime.nix`,
+[Uso Avançado do Nixpkgs - Introdução](./intro.md): `hello.nix`, `fcitx5-rime.nix`,
 `vscode/with-extensions.nix` e `firefox/common.nix`. Todos eles podem ser importados
 usando `pkgs.callPackage`.
 
