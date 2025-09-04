@@ -69,7 +69,7 @@ A capacidade de reversão e a reprodutibilidade do NixOS me deram uma enorme con
 não temo mais quebrar o sistema. Eu até me aventurei a experimentar coisas novas no NixOS,
 como o compositor hyprland. Anteriormente, no EndeavourOS, eu não teria ousado mexer com
 compositores tão novos, pois qualquer problema no sistema teria envolvido uma solução de
-problemas manual significativa usando várias "gambiaras".
+problemas manual significativa usando várias "gambiarras".
 
 À medida que me aprofundo cada vez mais em NixOS e Nix, percebo que eles também são muito
 adequados para gerenciar a configuração de múltiplos hosts de forma síncrona. Atualmente,
