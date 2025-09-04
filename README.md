@@ -5,7 +5,7 @@
 Quer saber mais sobre NixOS e Flakes em detalhes? Procurando por um tutorial para
 iniciantes? Então você veio ao lugar certo!
 
-:book: Um livro NixOS & Flakes não oficial e com opiniões para iniciantes: https://iedame.github.io/nixos-and-flakes-book-pt/
+:book: Um livro NixOS & Flakes não oficial e com opiniões para iniciantes: https://nixos-and-flakes.ieda.me/
 
 ---
 
@@ -17,7 +17,7 @@ English Version: https://nixos-and-flakes.thiscute.world/
 
 Versões Mantidas pela Comunidade:
 
-Versão em Português: https://iedame.github.io/nixos-and-flakes-book-pt/
+Versão em Português: https://nixos-and-flakes.ieda.me/
 
 日本語版: https://nixos-and-flakes-ja.hayao0819.com/
 
