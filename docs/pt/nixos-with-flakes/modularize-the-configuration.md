@@ -20,7 +20,7 @@ As funções desses quatro arquivos são:
 - `flake.nix`: O arquivo de entrada que será reconhecido e implantado ao executar
   `sudo nixos-rebuild switch`. Veja
   [Flakes - NixOS Wiki](https://wiki.nixos.org/wiki/Flakes) para todas as opções de
-  flake.nix..
+  `flake.nix`.
 - `configuration.nix`: Importado como um módulo Nix em flake.nix. Toda a configuração em
   nível de sistema está atualmente escrita aqui. Veja
   [Configuração - Manual do NixOS](https://nixos.org/manual/nixos/unstable/index.html#ch-configuration)
