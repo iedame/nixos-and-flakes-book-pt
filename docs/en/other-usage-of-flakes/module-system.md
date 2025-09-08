@@ -54,7 +54,7 @@ repetition:
   boot.
 - Host A should change the Docker storage driver to `btrfs` while keeping other settings
   the same.
-- Hosts B and C, located in China, need to set a domestic mirror in Docker configuration.
+- Hosts B, located in China, need to set a domestic mirror in Docker configuration.
 - Host C, located in the United States, has no special requirements.
 - Host D, a desktop machine, needs to set an HTTP proxy to accelerate Docker downloads.
 
@@ -223,7 +223,6 @@ Let's start with a simple example:
   outputs = {nixpkgs, ...}: {
     nixosConfigurations = {
       "test" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         modules = [
           ({config, lib, ...}: {
             options = {
@@ -335,7 +334,6 @@ The first thought might be to directly use `imports` in `config = { ... };`, lik
   outputs = {nixpkgs, ...}: {
     nixosConfigurations = {
       "test" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         modules = [
           ({config, lib, ...}: {
             options = {
@@ -400,7 +398,6 @@ Let's look at an example directly:
   outputs = {nixpkgs, ...}: {
     nixosConfigurations = {
       "test" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         specialArgs = { enableFoo = true; };
         modules = [
           ({config, lib, enableFoo ? false, ...}: {

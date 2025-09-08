@@ -73,7 +73,7 @@ Referencing this template, create the file `/etc/nixos/flake.nix` and write the
 configuration content. All subsequent system modifications will be taken over by Nix
 Flakes. Here's an example of the content:
 
-```nix{16}
+```nix{15}
 {
   description = "A simple NixOS flake";
 
@@ -85,7 +85,6 @@ Flakes. Here's an example of the content:
   outputs = { self, nixpkgs, ... }@inputs: {
     # Please replace my-nixos with your hostname
     nixosConfigurations.my-nixos = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
       modules = [
         # Import the previous configuration.nix we used,
         # so the old configuration file still takes effect
@@ -154,5 +153,5 @@ functionality of `flake.nix` and gradually see the benefits that such a wrapper 
   https://github.com/NixOS/nixpkgs/blob/nixos-25.05/doc/module-system/module-system.chapter.md
 [nixpkgs/nixos-25.05/lib/modules.nix - _module.args]:
   https://github.com/NixOS/nixpkgs/blob/nixos-25.05/lib/modules.nix#L122-L184
-[nixpkgs/nixos-25.05/nixos/doc/manual/development/option-types.section.md#L237-L244]:
-  https://github.com/NixOS/nixpkgs/blob/nixos-25.05/nixos/doc/manual/development/option-types.section.md?plain=1#L237-L244
+[nixpkgs/nixos-25.05/nixos/doc/manual/development/option-types.section.md#L268-L275]:
+  https://github.com/NixOS/nixpkgs/blob/nixos-25.05/nixos/doc/manual/development/option-types.section.md?plain=1#L268-L275

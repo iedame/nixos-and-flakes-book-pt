@@ -38,7 +38,7 @@ Manager 基于模块系统实现的各种 options 就已经能满足我们大部
 
 - A、B、C 跟 D 都需要启用 docker 服务，设置开机自启
 - A 需要将 docker 的存储驱动改为 `btrfs`，其他不变
-- B、C 是位于中国的服务器，需要在 docker 配置中设置国内镜像源
+- B 是位于中国的服务器，需要在 docker 配置中设置国内镜像源
 - C 是位于美国的服务器，无特殊要求
 - D 是桌面主机，需要为 docker 设置 HTTP 代理加速下载
 
@@ -196,7 +196,6 @@ in {
   outputs = {nixpkgs, ...}: {
     nixosConfigurations = {
       "test" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         modules = [
           ({config, lib, ...}: {
             options = {
@@ -293,7 +292,6 @@ Nixpkgs 中的模块系统提供了一系列类似 `lib.mkIf`
   outputs = {nixpkgs, ...}: {
     nixosConfigurations = {
       "test" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         modules = [
           ({config, lib, ...}: {
             options = {
@@ -355,7 +353,6 @@ Nixpkgs 中的模块系统提供了一系列类似 `lib.mkIf`
   outputs = {nixpkgs, ...}: {
     nixosConfigurations = {
       "test" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         specialArgs = { enableFoo = true; };
         modules = [
           ({config, lib, enableFoo ? false, ...}: {
